@@ -43,13 +43,17 @@ def _screenshot(App, Gui, params):
         raise ToolError(
             "unknown view %r; use one of %s" % (view_name, ", ".join(sorted(_VIEWS)))
         )
-    getattr(view, method)()
-    if params.get("fit", True):
-        view.fitAll()
+    # Flush pending events BEFORE changing the camera. Calling updateGui()
+    # after viewTop()/viewIsometric() renders a frame mid camera-animation
+    # (measured: a blank white image for the top view); saving right after
+    # the view change captures the final camera.
     try:
         Gui.updateGui()
     except Exception:
         pass
+    getattr(view, method)()
+    if params.get("fit", True):
+        view.fitAll()
 
     width = int(params.get("width") or 1024)
     height = int(params.get("height") or 768)
