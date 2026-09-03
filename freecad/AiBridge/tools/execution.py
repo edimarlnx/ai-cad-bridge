@@ -54,7 +54,10 @@ def _exec(App, Gui, params):
         result["result"] = jsonable(value)
         result["result_repr"] = repr(value)[:2000]
     if doc is not None:
-        result["document"] = doc.Name
+        try:
+            result["document"] = doc.Name
+        except ReferenceError:  # the code closed the document it ran in
+            result["document"] = None
     elif App.ActiveDocument is not None:
         result["document"] = App.ActiveDocument.Name
     return result

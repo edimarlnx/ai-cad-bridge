@@ -247,19 +247,31 @@ def _invoke(tool, params):
         pass
 
     doc.openTransaction(str(label))
+
+    def _finish(abort):
+        # The handler may have closed the document it was called on
+        # (fc_exec closing/reopening files); a dead proxy must not turn a
+        # finished call into an error.
+        try:
+            if abort:
+                doc.abortTransaction()
+            else:
+                doc.commitTransaction()
+        except ReferenceError:
+            pass
+
     try:
         result = handler(App, gui, params)
     except Exception:
-        doc.abortTransaction()
+        _finish(abort=True)
         raise
-    if (
-        tool.get("abort_on_failure")
-        and isinstance(result, dict)
-        and result.get("ok") is False
-    ):
-        doc.abortTransaction()
-    else:
-        doc.commitTransaction()
+    _finish(
+        abort=bool(
+            tool.get("abort_on_failure")
+            and isinstance(result, dict)
+            and result.get("ok") is False
+        )
+    )
     return result
 
 
