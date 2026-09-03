@@ -107,6 +107,29 @@ ai-cad-bridge/
 └── README.md                            (install, register, first prompt, safety)
 ```
 
+## Outcome that matters (user, 2026-09-03)
+
+**Build anything in FreeCAD and get it OUT: to 3D printing and, above all, to
+CNC.** Success is measured at the outputs, not at the model:
+
+- **3D printing**: STL / 3MF / STEP export of a body that is a single valid,
+  closed solid; report mesh stats (triangles, watertight, bbox, volume) and
+  flag thin walls when asked (measure via offset/section). The Cura host comes
+  later; for now the bridge hands a printable file to the user.
+- **CNC (primary)**: a CAM Job on the model with stock, tools and operations,
+  post-processed to **G-code for the user's machine**. The bridge must be able
+  to: create the job, add tool bits/controllers with real feeds/speeds, add
+  operations (profile, pocket, drilling, adaptive, engrave, 3D surface), run
+  the CAM simulation/inspection (tool paths inside stock, no rapid moves
+  through material, estimated time), and post-process with the right post
+  (grbl / linuxcnc / mach3 / … — **open question: which controller Edimar
+  uses**; default `grbl` until answered). Validation reads the G-code back
+  (moves bounded by stock, spindle on before cuts, safe heights, tool numbers).
+
+Phase 2 order therefore becomes: **CAM first** (right after Part Design, since
+CAM needs a body), then TechDraw (shop drawings for the same parts), then
+Assembly.
+
 ## Workbench coverage (user requirement, 2026-09-03)
 
 **Everything FreeCAD can do must be reachable, with first-class support for
