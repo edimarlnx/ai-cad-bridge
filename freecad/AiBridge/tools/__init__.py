@@ -11,6 +11,7 @@ from . import documents  # noqa: F401
 from . import execution  # noqa: F401
 from . import geometry  # noqa: F401
 from . import history  # noqa: F401
+from . import knowledge  # noqa: F401
 from . import sketching  # noqa: F401
 from . import structure  # noqa: F401
 from . import viewport  # noqa: F401
@@ -23,6 +24,7 @@ MODULES = (
     viewport,
     history,
     sketching,
+    knowledge,
 )
 
 
