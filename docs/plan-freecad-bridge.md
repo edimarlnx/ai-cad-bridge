@@ -107,6 +107,51 @@ ai-cad-bridge/
 └── README.md                            (install, register, first prompt, safety)
 ```
 
+## Workbench coverage (user requirement, 2026-09-03)
+
+**Everything FreeCAD can do must be reachable, with first-class support for
+Part Design, Assembly, TechDraw and CAM.** Two layers make that true:
+
+1. **Universal path**: `fc_exec` runs any FreeCAD Python (all workbenches are
+   Python-scriptable), so nothing is ever impossible. What makes it *usable* is
+   knowledge + validation, which is where the next layers come in.
+2. **Knowledge tools** (v1.5, ships with v1):
+   - `fc_api_help({module?, object?, query?})`: introspection of the live
+     FreeCAD (`dir()`, docstrings, property lists, `TypeId`s) so the agent does
+     not guess API names; e.g. `PartDesign::Pad` properties, `Assembly` joint
+     types, `TechDraw::DrawViewPart` props, `Path`/`CAM` op classes.
+   - `fc_recipes({workbench})`: curated, tested snippets per workbench (see
+     below) served as MCP resources too (`freecad://recipes/<workbench>`).
+   - `fc_workbenches`: which workbenches/modules are importable in this
+     FreeCAD (PartDesign, Sketcher, Assembly, TechDraw, Path/CAM, Mesh, Draft,
+     Spreadsheet, FEM) with versions, so the agent knows what it can use.
+3. **Workbench tool groups** (phase 2, one commit each, each with headless
+   tests that build a real thing and validate it):
+   - **Part Design** — `pd_body_create`, `pd_sketch_create` (plane/face,
+     geometry + constraints, returns DoF), `pd_pad/pocket/hole/fillet/chamfer/
+     pattern`, `pd_feature_state` (per-feature errors). Validation: body is one
+     valid solid, no invalid features, volume/bbox as expected.
+   - **Assembly** (built-in Assembly workbench, FreeCAD 1.x) — `asm_create`,
+     `asm_insert` (link to a part/body/file), `asm_joint` (fixed, revolute,
+     cylindrical, slider, ball, distance…), `asm_solve` (solver result, DoF,
+     conflicts/redundancies), `asm_bom`. Validation: solver converges, parts
+     placed where expected (measure distance), no overlaps (common volume).
+   - **TechDraw** — `td_page_create` (template), `td_view_add` (part view /
+     projection group / section / detail), `td_dimension_add`, `td_export`
+     (PDF/SVG/DXF). Validation: page renders (no `TechDraw` warnings), views
+     have geometry, export file exists and is non-empty.
+   - **CAM** (Path workbench = "CAM" in 1.x) — `cam_job_create` (model +
+     stock), `cam_tool_add` (tool bit + controller), `cam_op_add` (profile,
+     pocket, drilling, adaptive, engrave…), `cam_simulate` (path bounds,
+     time estimate, collisions with stock/clamps where the API allows),
+     `cam_postprocess` (G-code via a post processor: grbl, linuxcnc, …).
+     Validation: G-code produced, tool paths inside stock bounds, `Path`
+     objects without errors, feed/speed present.
+   Each group also gets a recipe file the agent can read before acting.
+
+Rule for all of them: a tool is only "done" when its headless test builds the
+object and the validation numbers pass under `FreeCADCmd` on this machine.
+
 ## Later
 
 Blender (bpy add-on with the same JSON-RPC contract), Cura (plugin + CuraEngine
