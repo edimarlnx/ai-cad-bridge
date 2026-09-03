@@ -122,8 +122,8 @@ CNC.** Success is measured at the outputs, not at the model:
   operations (profile, pocket, drilling, adaptive, engrave, 3D surface), run
   the CAM simulation/inspection (tool paths inside stock, no rapid moves
   through material, estimated time), and post-process with the right post
-  (grbl / linuxcnc / mach3 / … — **open question: which controller Edimar
-  uses**; default `grbl` until answered). Validation reads the G-code back
+  (**GRBL**, confirmed by Edimar 2026-09-03: FreeCAD post `grbl`; keep the
+  post name configurable per job). Validation reads the G-code back
   (moves bounded by stock, spindle on before cuts, safe heights, tool numbers).
 
 Phase 2 order therefore becomes: **CAM first** (right after Part Design, since
