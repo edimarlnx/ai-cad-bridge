@@ -19,7 +19,7 @@
 #   serration 130 radial V-bit notches at the cavity wall, 0.5 mm below the floor
 #
 # The relief is raised on the coin, so in the mold it is recessed below the
-# cavity floor. The reverse face is mirrored in X so the cast half reads
+# cavity floor. Both faces are mirrored (in Y) so the cast half reads
 # correctly; the obverse is not.
 import json
 import math
@@ -172,8 +172,12 @@ def import_face_shape(doc, svg_path, mirror_x):
     shape = Part.makeFace(wires, "Part::FaceMakerBullseye")
     for obj in imported:
         doc.removeObject(obj.Name)
+    # A mold cavity shows the design MIRRORED relative to how the cast reads:
+    # the SCAD block does it with rotate([180,0,0]) on the half coin, which is
+    # a mirror in Y for BOTH faces. Do the same here so the machined cavity
+    # matches the OpenSCAD blocks exactly (no face is ever left unmirrored).
     if mirror_x:
-        shape = shape.mirror(App.Vector(0, 0, 0), App.Vector(1, 0, 0))
+        shape = shape.mirror(App.Vector(0, 0, 0), App.Vector(0, 1, 0))
     shape.translate(App.Vector(0, 0, -CAVITY_DEPTH))
     return shape
 
@@ -203,11 +207,10 @@ def build_face(doc, value, diameter, face_name, gcode_dir, models_dir):
     relief = doc.addObject("Part::Feature", "Relief_%s" % face_name)
     relief.Shape = import_face_shape(
         doc, os.path.join(SVG_DIR, "%s-%s.svg" % (face_name, value)),
-        mirror_x=(face_name == "reverso"))
+        mirror_x=True)
     box = relief.Shape.BoundBox
-    log("relief x=[%.2f, %.2f] y=[%.2f, %.2f] z=%.2f faces=%d%s" % (
-        box.XMin, box.XMax, box.YMin, box.YMax, box.ZMax, len(relief.Shape.Faces),
-        " (mirrored in X)" if face_name == "reverso" else ""))
+    log("relief x=[%.2f, %.2f] y=[%.2f, %.2f] z=%.2f faces=%d (mirrored in Y, mold)" % (
+        box.XMin, box.XMax, box.YMin, box.YMax, box.ZMax, len(relief.Shape.Faces)))
     serration = doc.addObject("Part::Feature", "Serration_%s" % face_name)
     serration.Shape = Part.Compound(serration_edges(diameter))
     doc.recompute()

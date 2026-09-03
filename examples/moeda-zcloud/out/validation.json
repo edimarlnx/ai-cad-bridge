@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-03 15:27:05",
+  "generated_at": "2026-09-03 16:17:36",
   "freecad": "1.1.3",
   "post": "grbl",
   "post_args": "--translate_drill",
@@ -63,14 +63,14 @@
           "operation": "op2_relief_anverso",
           "type": "vcarve",
           "tool_number": 2,
-          "commands": 6362,
+          "commands": 6358,
           "z_min": -2.9,
           "z_max": 8.0,
           "x_min": -11.6083,
           "x_max": 11.774,
           "StartDepth": -1.8,
           "FinalDepth": -2.9,
-          "cycle_time": "00:21:01"
+          "cycle_time": "00:21:03"
         },
         {
           "operation": "op3_pearls_anverso",
@@ -99,7 +99,7 @@
           "cycle_time": "00:08:50"
         }
       ],
-      "job_estimated_seconds": 1839.7,
+      "job_estimated_seconds": 1840.7,
       "pearl_plunges": 52,
       "serration_notches": 130,
       "gcode": [
@@ -128,7 +128,7 @@
         {
           "file": "anverso-1-op2_4-T2-vbit30.gcode",
           "ok": true,
-          "lines": 7442,
+          "lines": 7438,
           "z_min": -2.9,
           "z_max": 8.0,
           "x_min": -17.0,
@@ -138,10 +138,10 @@
           "tools": [
             2
           ],
-          "estimated_seconds": 1715.0,
+          "estimated_seconds": 1716.7,
           "moves": {
             "rapid": 1339,
-            "feed": 6014,
+            "feed": 6010,
             "arc": 0,
             "plunges": 52,
             "drill_cycles": 0
@@ -174,14 +174,14 @@
           "operation": "op2_relief_reverso",
           "type": "vcarve",
           "tool_number": 2,
-          "commands": 5210,
+          "commands": 5213,
           "z_min": -2.9,
           "z_max": 8.0,
-          "x_min": -12.812,
-          "x_max": 12.879,
+          "x_min": -12.879,
+          "x_max": 12.812,
           "StartDepth": -1.8,
           "FinalDepth": -2.9,
-          "cycle_time": "00:20:58"
+          "cycle_time": "00:21:04"
         },
         {
           "operation": "op3_pearls_reverso",
@@ -210,7 +210,7 @@
           "cycle_time": "00:08:50"
         }
       ],
-      "job_estimated_seconds": 1855.7,
+      "job_estimated_seconds": 1860.5,
       "pearl_plunges": 52,
       "serration_notches": 130,
       "gcode": [
@@ -239,7 +239,7 @@
         {
           "file": "reverso-1-op2_4-T2-vbit30.gcode",
           "ok": true,
-          "lines": 6290,
+          "lines": 6293,
           "z_min": -2.9,
           "z_max": 8.0,
           "x_min": -17.0,
@@ -249,10 +249,10 @@
           "tools": [
             2
           ],
-          "estimated_seconds": 1731.0,
+          "estimated_seconds": 1736.5,
           "moves": {
-            "rapid": 1347,
-            "feed": 4854,
+            "rapid": 1351,
+            "feed": 4853,
             "arc": 0,
             "plunges": 52,
             "drill_cycles": 0
@@ -285,14 +285,14 @@
           "operation": "op2_relief_anverso",
           "type": "vcarve",
           "tool_number": 2,
-          "commands": 6847,
+          "commands": 6851,
           "z_min": -2.9,
           "z_max": 8.0,
           "x_min": -12.6324,
           "x_max": 12.813,
           "StartDepth": -1.8,
           "FinalDepth": -2.9,
-          "cycle_time": "00:22:02"
+          "cycle_time": "00:22:03"
         },
         {
           "operation": "op3_pearls_anverso",
@@ -321,7 +321,7 @@
           "cycle_time": "00:08:50"
         }
       ],
-      "job_estimated_seconds": 1937.9,
+      "job_estimated_seconds": 1938.9,
       "pearl_plunges": 52,
       "serration_notches": 130,
       "gcode": [
@@ -350,7 +350,7 @@
         {
           "file": "anverso-5-op2_4-T2-vbit30.gcode",
           "ok": true,
-          "lines": 7927,
+          "lines": 7931,
           "z_min": -2.9,
           "z_max": 8.0,
           "x_min": -18.5,
@@ -360,10 +360,10 @@
           "tools": [
             2
           ],
-          "estimated_seconds": 1768.1,
+          "estimated_seconds": 1770.0,
           "moves": {
             "rapid": 1363,
-            "feed": 6475,
+            "feed": 6479,
             "arc": 0,
             "plunges": 52,
             "drill_cycles": 0
@@ -396,14 +396,14 @@
           "operation": "op2_relief_reverso",
           "type": "vcarve",
           "tool_number": 2,
-          "commands": 6244,
+          "commands": 6246,
           "z_min": -2.9,
           "z_max": 8.0,
-          "x_min": -13.943,
-          "x_max": 14.016,
+          "x_min": -14.016,
+          "x_max": 13.943,
           "StartDepth": -1.8,
           "FinalDepth": -2.9,
-          "cycle_time": "00:24:16"
+          "cycle_time": "00:24:15"
         },
         {
           "operation": "op3_pearls_reverso",
@@ -432,7 +432,7 @@
           "cycle_time": "00:08:50"
         }
       ],
-      "job_estimated_seconds": 2074.3,
+      "job_estimated_seconds": 2072.5,
       "pearl_plunges": 52,
       "serration_notches": 130,
       "gcode": [
@@ -461,7 +461,7 @@
         {
           "file": "reverso-5-op2_4-T2-vbit30.gcode",
           "ok": true,
-          "lines": 7324,
+          "lines": 7326,
           "z_min": -2.9,
           "z_max": 8.0,
           "x_min": -18.5,
@@ -471,10 +471,10 @@
           "tools": [
             2
           ],
-          "estimated_seconds": 1904.6,
+          "estimated_seconds": 1903.6,
           "moves": {
             "rapid": 1445,
-            "feed": 5790,
+            "feed": 5792,
             "arc": 0,
             "plunges": 52,
             "drill_cycles": 0
@@ -514,7 +514,7 @@
           "x_max": 13.852,
           "StartDepth": -1.8,
           "FinalDepth": -2.9,
-          "cycle_time": "00:25:39"
+          "cycle_time": "00:25:41"
         },
         {
           "operation": "op3_pearls_anverso",
@@ -543,7 +543,7 @@
           "cycle_time": "00:08:50"
         }
       ],
-      "job_estimated_seconds": 2172.6,
+      "job_estimated_seconds": 2174.9,
       "pearl_plunges": 52,
       "serration_notches": 130,
       "gcode": [
@@ -582,7 +582,7 @@
           "tools": [
             2
           ],
-          "estimated_seconds": 1954.8,
+          "estimated_seconds": 1958.0,
           "moves": {
             "rapid": 1469,
             "feed": 6883,
@@ -618,14 +618,14 @@
           "operation": "op2_relief_reverso",
           "type": "vcarve",
           "tool_number": 2,
-          "commands": 9265,
+          "commands": 9260,
           "z_min": -2.9,
           "z_max": 8.0,
-          "x_min": -15.073,
-          "x_max": 15.152,
+          "x_min": -15.152,
+          "x_max": 15.073,
           "StartDepth": -1.8,
           "FinalDepth": -2.9,
-          "cycle_time": "00:34:14"
+          "cycle_time": "00:34:11"
         },
         {
           "operation": "op3_pearls_reverso",
@@ -654,7 +654,7 @@
           "cycle_time": "00:08:50"
         }
       ],
-      "job_estimated_seconds": 2642.5,
+      "job_estimated_seconds": 2639.6,
       "pearl_plunges": 52,
       "serration_notches": 130,
       "gcode": [
@@ -683,7 +683,7 @@
         {
           "file": "reverso-10-op2_4-T2-vbit30.gcode",
           "ok": true,
-          "lines": 10345,
+          "lines": 10340,
           "z_min": -2.9,
           "z_max": 8.0,
           "x_min": -20.0,
@@ -693,10 +693,10 @@
           "tools": [
             2
           ],
-          "estimated_seconds": 2424.7,
+          "estimated_seconds": 2422.6,
           "moves": {
             "rapid": 1753,
-            "feed": 8503,
+            "feed": 8498,
             "arc": 0,
             "plunges": 52,
             "drill_cycles": 0
@@ -705,5 +705,5 @@
       ]
     }
   ],
-  "seconds": 84.7
+  "seconds": 85.5
 }
