@@ -204,3 +204,7 @@ Re-run it whenever a tool's schema changes; it rewrites `bridge/fallback_tools.j
   `fc_workbenches` still reports Draft without importing it, and `fc_api_help`
   refuses to import it headless unless you pass `force: true`.
 * Screenshots need a GUI session.
+
+## License
+
+Apache License 2.0. See `LICENSE` and `NOTICE`.

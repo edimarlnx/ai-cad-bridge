@@ -10,9 +10,9 @@
   </description>
   <version>0.1.0</version>
   <date>2026-09-03</date>
-  <maintainer email="edimar@quave.com.br">Edimar (Zodo)</maintainer>
-  <license>LGPL-2.1-or-later</license>
-  <url type="repository" branch="main">https://github.com/zodo-dev/ai-cad-bridge</url>
+  <maintainer email="edimarlnx@gmail.com">Edimar Cardoso</maintainer>
+  <license file="LICENSE">Apache-2.0</license>
+  <url type="repository" branch="main">https://github.com/edimarlnx/ai-cad-bridge</url>
 
   <content>
     <workbench>

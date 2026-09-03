@@ -10,3 +10,4 @@ examples/moeda-zcloud/out/*.gcode
 examples/moeda-zcloud/out/*.step
 examples/moeda-zcloud/out/*.stl
 examples/moeda-zcloud/out/*.FCStd
+examples/moeda-zcloud/out/face2d.scad

@@ -18,7 +18,13 @@ set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(cd "${HERE}/../.." && pwd)"
 FLATPAK_APP="org.freecad.FreeCAD"
-MASTER="${HOME}/Projetos/edimar/my-ideas/eletronica/moeda-zcloud-master.scad"
+# Point MOEDA_MASTER_SCAD at your OpenSCAD master (the coin design is not part
+# of this repo). Output goes to MOEDA_OUT_DIR (default: examples/moeda-zcloud/out/cnc).
+MASTER="${MOEDA_MASTER_SCAD:-${HOME}/Projetos/edimar/my-ideas/eletronica/moeda-zcloud-master.scad}"
+if [ ! -f "${MASTER}" ]; then
+  echo "error: OpenSCAD master not found at ${MASTER} (set MOEDA_MASTER_SCAD)" >&2
+  exit 1
+fi
 SVG_DIR="${HERE}/svg"
 
 command -v openscad >/dev/null 2>&1 || { echo "error: openscad not found" >&2; exit 1; }
@@ -26,6 +32,11 @@ command -v flatpak >/dev/null 2>&1 || { echo "error: flatpak not found" >&2; exi
 [ -f "${MASTER}" ] || { echo "error: coin master not found at ${MASTER}" >&2; exit 1; }
 
 mkdir -p "${SVG_DIR}"
+
+# Materialise the wrapper with the real master path (the template has a placeholder).
+mkdir -p "${HERE}/out"
+WRAPPER="${HERE}/out/face2d.scad"
+sed "s#@MASTER_SCAD@#${MASTER}#" "${HERE}/face2d.scad" > "${WRAPPER}"
 
 echo "### 1/2 exporting the coin faces with openscad (host)"
 # denomination -> coin diameter, from moeda-zcloud.md section 3.
@@ -39,7 +50,7 @@ for pair in "1:34" "5:37" "10:40"; do
       -D "face=\"${face}\"" \
       -D "diametro=${diameter}" \
       -D "valor=\"${value}\"" \
-      "${HERE}/face2d.scad" 2>/dev/null
+      "${WRAPPER}" 2>/dev/null
     printf '  %-24s %6s bytes\n' "$(basename "${out}")" "$(stat -c %s "${out}")"
   done
 done

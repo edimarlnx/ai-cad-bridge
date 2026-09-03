@@ -5,8 +5,9 @@
 //            -D 'diametro=37' -D 'valor="5"' face2d.scad
 //
 // vista="none" suppresses the master's own top-level output; only the 2D face
-// module below is rendered.
-include </home/edimar/Projetos/edimar/my-ideas/eletronica/moeda-zcloud-master.scad>
+// module below is rendered. run.sh replaces @MASTER_SCAD@ with the real path
+// (MOEDA_MASTER_SCAD) into out/face2d.scad before calling openscad.
+include <@MASTER_SCAD@>
 
 face = "anverso";
 

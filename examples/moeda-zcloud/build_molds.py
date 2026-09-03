@@ -40,7 +40,10 @@ sys.path.insert(0, os.path.join(_REPO, "freecad", "AiBridge"))
 from tools import cam  # noqa: E402  (needs the sys.path line above)
 
 # --- parameters -------------------------------------------------------------
-OUT_DIR = os.path.expanduser("~/Projetos/edimar/my-ideas/eletronica/moeda-zcloud-cnc")
+OUT_DIR = os.path.expanduser(
+    os.environ.get("MOEDA_OUT_DIR")
+    or os.path.join(os.path.dirname(os.path.abspath(__file__)), "out", "cnc")
+)
 SVG_DIR = os.path.join(_HERE, "svg")
 REPO_OUT = os.path.join(_HERE, "out")
 

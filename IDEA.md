@@ -24,7 +24,7 @@ CAD, 3D and printing, with a do → validate loop that happens in the software i
 ## Starting point
 
 - FreeCAD already has ground here: offline VSM extension on FreeCAD Flatpak 1.1.1 with Ollama
-  (see memory `freecad-host-env`) and the "own model as FreeCAD host" idea.
+  (an earlier offline extension on FreeCAD Flatpak) and the "own model as FreeCAD host" idea.
 - MyBenchLab follows the same MCP-first philosophy (AI generates an editable feature list).
 - Suggested order: FreeCAD (Python API, MCP server in-process) → Blender (bpy, socket/MCP
   bridge as add-on) → Cura (plugin + CuraEngine CLI).
