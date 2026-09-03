@@ -25,6 +25,7 @@ Two responsibilities:
 """
 
 import queue
+import json
 import threading
 import time
 import traceback
@@ -90,6 +91,7 @@ def call_tool(name, params):
     tool = registry().get(name)
     if tool is None:
         raise ToolError("unknown tool: %s" % name)
+    params = _coerce_params(tool, params)
 
     def run():
         return _invoke(tool, params)
@@ -102,6 +104,42 @@ def call_tool(name, params):
         return _run_via_pump(run)
     # No GUI and no pump: nothing else can run this, so run it here.
     return run()
+
+
+def _coerce_params(tool, params):
+    """Parse JSON strings for params the schema types as non-strings.
+
+    An MCP client that connected while the bridge was offline only knows an
+    untyped schema and may send ``"[\"Box\"]"`` for an array parameter. Being
+    lenient here costs nothing and turns a confusing failure into a call that
+    just works.
+    """
+    if not isinstance(params, dict):
+        return params
+    properties = (tool.get("inputSchema") or {}).get("properties") or {}
+    fixed = dict(params)
+    for key, value in params.items():
+        if not isinstance(value, str):
+            continue
+        expected = (properties.get(key) or {}).get("type")
+        if expected in ("array", "object", "number", "integer", "boolean"):
+            text = value.strip()
+            if expected == "boolean" and text.lower() in ("true", "false"):
+                fixed[key] = text.lower() == "true"
+                continue
+            try:
+                parsed = json.loads(text)
+            except ValueError:
+                continue
+            if expected == "array" and isinstance(parsed, list):
+                fixed[key] = parsed
+            elif expected == "object" and isinstance(parsed, dict):
+                fixed[key] = parsed
+            elif expected in ("number", "integer") and isinstance(
+                parsed, (int, float)
+            ):
+                fixed[key] = parsed
+    return fixed
 
 
 # -- headless main-thread pump -------------------------------------------
