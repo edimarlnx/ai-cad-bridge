@@ -46,7 +46,22 @@ class ToolError(Exception):
 
 
 def gui_module():
-    """Return the ``FreeCADGui`` module when a real GUI is up, else ``None``."""
+    """Return the ``FreeCADGui`` module when a real GUI is up, else ``None``.
+
+    ``FreeCAD.GuiUp`` is checked FIRST and the import is skipped when it is
+    false. Importing ``FreeCADGui`` under FreeCADCmd half-registers the Qt
+    resource system, and any later ``import Draft`` then SIGSEGVs while it reads
+    ``:/ui/preferences-*.ui`` — which is exactly what CAM's ``Job.Create`` does
+    (it lazily calls ``Draft.clone``). Measured on FreeCAD 1.1.3: with the
+    import, cam_job_create crashes the process; without it, it works.
+    """
+    try:
+        import FreeCAD
+
+        if not FreeCAD.GuiUp:
+            return None
+    except Exception:
+        return None
     try:
         import FreeCADGui
     except Exception:

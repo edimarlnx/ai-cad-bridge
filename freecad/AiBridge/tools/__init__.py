@@ -7,6 +7,7 @@ Handlers take ``App``/``Gui`` as arguments so every one of them is testable
 under FreeCADCmd, where ``Gui`` is ``None``.
 """
 
+from . import cam  # noqa: F401
 from . import documents  # noqa: F401
 from . import execution  # noqa: F401
 from . import geometry  # noqa: F401
@@ -25,6 +26,7 @@ MODULES = (
     history,
     sketching,
     knowledge,
+    cam,
 )
 
 

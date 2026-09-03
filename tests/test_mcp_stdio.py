@@ -276,9 +276,21 @@ def run_offline_checks(config_dir):
         listing = client.request("tools/list")["result"]["tools"]
         names = {tool["name"] for tool in listing}
         check("the static catalogue is returned", "fc_exec" in names and len(names) >= 19, sorted(names))
+        check("the CAM tools are in it too", "cam_gcode_check" in names, sorted(names))
         check(
             "descriptions say the bridge is offline",
             all("offline" in tool["description"] for tool in listing),
+        )
+        # A client caches this catalogue for the session, so the offline schemas
+        # must be typed exactly like the live ones or array arguments arrive as
+        # strings from then on.
+        by_name = {tool["name"]: tool for tool in listing}
+        measure = by_name.get("fc_measure", {}).get("inputSchema", {})
+        check(
+            "offline schemas are the generated, typed ones",
+            (measure.get("properties", {}).get("objects", {}).get("type") == "array"
+             and measure.get("required") == ["kind", "objects"]),
+            measure,
         )
         called = client.request("tools/call", {"name": "fc_status", "arguments": {}})["result"]
         check("call reports isError", called.get("isError") is True, called)

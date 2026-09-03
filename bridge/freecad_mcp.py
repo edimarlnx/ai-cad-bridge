@@ -76,6 +76,13 @@ Report the measured numbers, not your intentions.
 """
 
 # Used when the add-on is unreachable, so an agent can still see what exists.
+# An MCP client caches the catalogue it receives at connect time, so this list
+# has to carry the SAME schemas as the live tools: without them array arguments
+# arrive as strings for the rest of the session. fallback_tools.json is the
+# generated, schema-complete copy (bridge/gen_fallback.py); the inline pairs
+# below are only a last resort if that file is missing.
+FALLBACK_TOOLS_PATH = os.path.join(_HERE, "fallback_tools.json")
+
 FALLBACK_TOOLS = [
     ("fc_status", "FreeCAD version, GUI or headless, active document, server uptime."),
     ("fc_doc_list", "List open documents."),
@@ -96,7 +103,41 @@ FALLBACK_TOOLS = [
     ("fc_workbenches", "Which FreeCAD workbenches this build can use."),
     ("fc_api_help", "Live introspection of modules, attributes and TypeIds."),
     ("fc_recipes", "Verified snippets per workbench."),
+    ("cam_job_create", "Create a CAM job (model + stock + tools)."),
+    ("cam_tool_add", "Add or edit a tool controller with real feeds and speeds."),
+    ("cam_op_add", "Add a CAM operation (pocket, vcarve, drilling, engrave, ...)."),
+    ("cam_inspect", "Read the toolpaths back: counts, Z range, XY bounds, time."),
+    ("cam_postprocess", "Post-process to G-code files, one per tool if asked."),
+    ("cam_gcode_check", "Re-parse G-code: bounds, depth, safe rapids, spindle, tools."),
 ]
+
+
+def load_fallback_tools():
+    """The generated catalogue, or the inline names when it is not there."""
+    try:
+        with open(FALLBACK_TOOLS_PATH, "r", encoding="utf-8") as handle:
+            catalogue = json.load(handle).get("tools")
+        if catalogue:
+            return [
+                {
+                    "name": tool["name"],
+                    "description": "%s [FreeCAD bridge offline: start it to use this]"
+                    % tool.get("description", ""),
+                    "inputSchema": tool.get("inputSchema")
+                    or {"type": "object", "properties": {}},
+                }
+                for tool in catalogue
+            ]
+    except Exception as exc:
+        log("no generated fallback catalogue (%s); using the inline names" % exc)
+    return [
+        {
+            "name": name,
+            "description": "%s [FreeCAD bridge offline: start it to use this]" % description,
+            "inputSchema": {"type": "object", "additionalProperties": True},
+        }
+        for name, description in FALLBACK_TOOLS
+    ]
 
 NOT_RUNNING_HINT = (
     "The FreeCAD AI Bridge is not reachable at %s. Start it: open FreeCAD, pick "
@@ -245,17 +286,7 @@ def handle_tools_list(params):
         log("tools.list returned no tools; using the fallback catalogue")
     except AddonError as exc:
         log("add-on unreachable (%s); using the fallback catalogue" % exc)
-    return {
-        "tools": [
-            {
-                "name": name,
-                "description": "%s [FreeCAD bridge offline: start it to use this]"
-                % description,
-                "inputSchema": {"type": "object", "additionalProperties": True},
-            }
-            for name, description in FALLBACK_TOOLS
-        ]
-    }
+    return {"tools": load_fallback_tools()}
 
 
 def handle_tools_call(params):

@@ -121,6 +121,8 @@ def run_checks(client):
         "fc_tree", "fc_object_get", "fc_exec", "fc_recompute", "fc_measure",
         "fc_check", "fc_screenshot", "fc_export", "fc_undo", "fc_redo",
         "fc_sketch_summary", "fc_workbenches", "fc_api_help", "fc_recipes",
+        "cam_job_create", "cam_tool_add", "cam_op_add", "cam_inspect",
+        "cam_postprocess", "cam_gcode_check",
     }
     check("every planned tool is registered", expected <= names, sorted(expected - names))
     check(
@@ -318,6 +320,167 @@ def run_checks(client):
     check("unknown tool is an error", "error" in unknown, unknown)
     bad_method = client.rpc("nope.nope")
     check("unknown method is -32601", bad_method["error"]["code"] == -32601, bad_method)
+
+    run_cam_checks(client)
+
+
+def run_cam_checks(client):
+    """Job on a box -> one pocket -> GRBL G-code -> the pure parser accepts it."""
+    section("CAM: job, tool, pocket")
+    cam_doc = client.call("fc_doc_new", {"name": "CamTest"})["document"]["name"]
+    client.call(
+        "fc_exec",
+        {
+            "doc": cam_doc,
+            "code": (
+                "box = doc.addObject('Part::Box', 'Stock')\n"
+                "box.Length = 40\nbox.Width = 40\nbox.Height = 10\n"
+                "doc.recompute()\n"
+                # The pocket needs the top face, whose index is not guaranteed.
+                "top = [i + 1 for i, f in enumerate(box.Shape.Faces)\n"
+                "       if abs(f.BoundBox.ZMin - 10) < 1e-6"
+                " and f.BoundBox.ZLength < 1e-6]\n"
+                "_result = top[0]\n"
+            ),
+            "transaction_name": "cam stock",
+        },
+    )
+    top_face = client.call("fc_object_get", {"doc": cam_doc, "name": "Stock"})
+    check("stock box is 40x40x10", top_face["shape"]["volume_mm3"] == 16000.0, top_face["shape"])
+
+    job = client.call("cam_job_create", {"doc": cam_doc, "models": ["Stock"], "post": "grbl"})
+    check("job was created", job["job"].startswith("Job"), job)
+    check(
+        "stock hugs the model",
+        job["stock"]["z_max"] == 10.0 and job["stock"]["x_max"] == 40.0
+        and job["stock"]["x_min"] == 0.0,
+        job["stock"],
+    )
+    check("job starts with one tool controller", len(job["tools"]) == 1, job["tools"])
+
+    tool = client.call(
+        "cam_tool_add",
+        {
+            "doc": cam_doc, "job": job["job"], "reuse": job["tools"][0]["name"],
+            "label": "T1 endmill 3", "number": 1, "diameter": 3.0,
+            "horiz_feed": 600, "vert_feed": 200, "horiz_rapid": 2000,
+            "vert_rapid": 800, "spindle_speed": 10000,
+        },
+    )
+    check("tool diameter is 3 mm", tool["bit"]["diameter_mm"] == 3.0, tool["bit"])
+    # Velocities are mm/s internally: a bare 600 would post as F36000.
+    check("feed is stored as 600 mm/min", tool["feeds"]["horiz_mm_min"] == 600.0, tool["feeds"])
+
+    faces = client.call(
+        "fc_exec",
+        {
+            "doc": cam_doc,
+            "code": (
+                "clone = doc.getObject(%r).Model.Group[0]\n"
+                "_result = [i + 1 for i, f in enumerate(clone.Shape.Faces)\n"
+                "           if abs(f.BoundBox.ZMin - 10) < 1e-6"
+                " and f.BoundBox.ZLength < 1e-6][0]\n" % job["job"]
+            ),
+        },
+    )
+    face_index = int(faces["result"])
+    clone_name = client.call("fc_exec", {
+        "doc": cam_doc,
+        "code": "_result = doc.getObject(%r).Model.Group[0].Name\n" % job["job"],
+    })["result"]
+
+    op = client.call(
+        "cam_op_add",
+        {
+            "doc": cam_doc, "job": job["job"], "type": "pocket_shape",
+            "name": "op1_pocket", "tool": tool["controller"],
+            "base": [{"object": clone_name, "subs": ["Face%d" % face_index]}],
+            "properties": {
+                "StartDepth": 10.0, "FinalDepth": 8.0, "StepDown": 1.0,
+                "StepOver": 50, "SafeHeight": 12.0, "ClearanceHeight": 15.0,
+                "UseOutline": True,
+            },
+        },
+    )
+    check("the pocket produced a toolpath", op.get("commands", 0) > 10, op)
+    # Without clearing the SetupSheet expressions the depths silently revert.
+    check("FinalDepth stuck at 8 mm", op.get("FinalDepth") == 8.0, op)
+    check("expressions were cleared", "FinalDepth" in op["cleared_expressions"], op)
+
+    section("cam_inspect")
+    inspection = client.call("cam_inspect", {"doc": cam_doc, "job": job["job"]})
+    check("inspect is happy", inspection["ok"] is True, inspection["issues"])
+    check("one operation is listed", len(inspection["operations"]) == 1, inspection["operations"])
+    check("a time estimate came back", inspection["estimated_seconds"] > 0, inspection)
+
+    section("cam_postprocess")
+    gcode_dir = os.path.join(_TEMP, "cam")
+    gcode_path = os.path.join(gcode_dir, "cam-test-T1.gcode")
+    if os.path.exists(gcode_path):
+        os.remove(gcode_path)
+    posted = client.call(
+        "cam_postprocess",
+        {
+            "doc": cam_doc, "job": job["job"], "post": "grbl", "split_by": "tool",
+            "output_dir": gcode_dir, "files": ["cam-test-T1.gcode"],
+        },
+    )
+    check("one file per tool", len(posted["files"]) == 1, posted["files"])
+    check("the file exists", os.path.exists(gcode_path), gcode_path)
+    check("and has real content", posted["files"][0]["lines"] > 20, posted["files"][0])
+    guarded = client.rpc(
+        "tools.call",
+        {
+            "name": "cam_postprocess",
+            "arguments": {
+                "doc": cam_doc, "job": job["job"], "split_by": "tool",
+                "output_dir": gcode_dir, "files": ["cam-test-T1.gcode"],
+            },
+        },
+    )
+    check("existing G-code is not overwritten", "error" in guarded, guarded)
+
+    section("cam_gcode_check")
+    verdict = client.call(
+        "cam_gcode_check",
+        {
+            "path": gcode_path,
+            "bounds": {"x_min": -1.0, "x_max": 41.0, "y_min": -1.0, "y_max": 41.0},
+            "z_floor": 7.9, "safe_height": 12.0, "tools": [1],
+        },
+    )
+    check("the posted G-code passes", verdict["ok"] is True, verdict["issues"])
+    check("it measured the floor", verdict["z_min"] == 8.0, verdict)
+    check("it found the tool number", verdict["tools"] == [1], verdict)
+    check("the spindle is on before the cut", verdict["spindle_on_before_first_cut"] is True,
+          verdict)
+
+    too_deep = client.call(
+        "cam_gcode_check",
+        {"path": gcode_path, "z_floor": 9.5, "safe_height": 12.0},
+    )
+    check("a violated depth limit is caught", too_deep["ok"] is False, too_deep["issues"])
+
+    handmade = client.call(
+        "cam_gcode_check",
+        {
+            "text": "G21 G90\nG0 X0 Y0 Z5\nG1 X10 Y0 Z-1 F300\nG0 X20 Y20\nM5\n",
+            "z_floor": -2.0, "safe_height": 5.0, "tools": [1],
+        },
+    )
+    check(
+        "the pure parser flags an unsafe rapid, a missing spindle and no tool",
+        handmade["ok"] is False and len(handmade["issues"]) >= 3,
+        handmade["issues"],
+    )
+    arc = client.call(
+        "cam_gcode_check",
+        {"text": "G21 G90\nM3 S1000\nG0 X10 Y0 Z5\nG1 Z-1 F100\n"
+                 "G3 X-10 Y0 I-10 J0 F300\n", "safe_height": 5.0},
+    )
+    # Endpoints alone would say Y never leaves 0; the arc sweeps up to Y=10.
+    check("arcs are bounded by their sweep, not their end points",
+          arc["y_max"] == 10.0, arc)
 
 
 print("=== AI Bridge headless proof (in-process, Flatpak FreeCAD) ===")

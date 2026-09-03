@@ -1,0 +1,749 @@
+{
+  "tools": [
+    {
+      "name": "cam_gcode_check",
+      "description": "Parse a G-code file (or text) without FreeCAD and prove it is safe to run: XY inside the given bounds, Z never below z_floor, rapid XY moves only at or above safe_height, spindle started before the first cut below Z0, a feed rate present, expected tool numbers, and no canned drill cycle (GRBL has none). Returns the measured extents, move counts and a time estimate.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "bounds": {
+            "type": "object",
+            "properties": {
+              "x_min": {
+                "type": "number"
+              },
+              "x_max": {
+                "type": "number"
+              },
+              "y_min": {
+                "type": "number"
+              },
+              "y_max": {
+                "type": "number"
+              }
+            }
+          },
+          "z_floor": {
+            "type": "number",
+            "description": "Deepest allowed Z (negative)."
+          },
+          "safe_height": {
+            "type": "number"
+          },
+          "rapid_rate": {
+            "type": "number",
+            "description": "mm/min for the estimate."
+          },
+          "tools": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "cam_inspect",
+      "description": "Read the job back: per operation the command count, Z range, XY extents, cut length, cycle time and a feed-based time estimate, plus the stock box and the tool table. 'ok' is false when an operation is in error, produced no path, or leaves the stock.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "job": {
+            "type": "string",
+            "description": "CAM job name or label; optional when the document has only one."
+          },
+          "doc": {
+            "type": "string",
+            "description": "Document name; defaults to the active document."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "cam_job_create",
+      "description": "Create a CAM (Path) job on one or more solids: stock from the model bounding box, a SetupSheet, an Operations group and a default 5 mm endmill controller. Set stock_to_model false to keep the default stock margins.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "models": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Object names of the solids to machine."
+          },
+          "name": {
+            "type": "string",
+            "description": "Job name (default 'Job')."
+          },
+          "post": {
+            "type": "string",
+            "description": "Post processor, e.g. 'grbl'."
+          },
+          "post_args": {
+            "type": "string",
+            "description": "Post arguments, e.g. '--translate_drill'."
+          },
+          "stock_to_model": {
+            "type": "boolean",
+            "description": "Zero the stock margins (default true)."
+          },
+          "geometry_tolerance": {
+            "type": "number"
+          },
+          "doc": {
+            "type": "string",
+            "description": "Document name; defaults to the active document."
+          }
+        },
+        "required": [
+          "models"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "cam_op_add",
+      "description": "Add an operation to a job (pocket_shape, pocket, profile, vcarve, drilling, engrave, adaptive, surface, millface, helix, slot, deburr). 'base' limits it to geometry ([{object, subs:['Face3','Edge7']}]), 'base_shapes' feeds whole objects (vcarve takes its faces this way and starts from their ZMax), 'locations' gives drilling explicit points. 'properties' sets any operation property (StartDepth, FinalDepth, StepDown, StepOver, SafeHeight, ClearanceHeight, ...); the tool first clears the SetupSheet expression bound to it, without which the value would be silently reverted on the next recompute.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "job": {
+            "type": "string",
+            "description": "CAM job name or label; optional when the document has only one."
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "adaptive",
+              "deburr",
+              "drilling",
+              "engrave",
+              "helix",
+              "millface",
+              "pocket",
+              "pocket_shape",
+              "profile",
+              "slot",
+              "surface",
+              "vcarve"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "tool": {
+            "type": "string",
+            "description": "Tool controller name, label or number."
+          },
+          "base": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "object": {
+                  "type": "string"
+                },
+                "subs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "object"
+              ]
+            }
+          },
+          "base_shapes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "locations": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "description": "Drilling points [[x, y, z], ...]."
+          },
+          "properties": {
+            "type": "object",
+            "description": "Operation properties to assign."
+          },
+          "doc": {
+            "type": "string",
+            "description": "Document name; defaults to the active document."
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "cam_postprocess",
+      "description": "Post-process the job to G-code files. split_by 'tool' writes one file per tool number (what a GRBL machine without a tool changer needs), 'operation' one per operation, 'none' a single file. Pass 'files' to name the outputs in section order. Existing files are never replaced unless overwrite is true.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "job": {
+            "type": "string",
+            "description": "CAM job name or label; optional when the document has only one."
+          },
+          "post": {
+            "type": "string",
+            "description": "Post processor (default 'grbl')."
+          },
+          "post_args": {
+            "type": "string",
+            "description": "e.g. '--translate_drill' (GRBL has no G81)."
+          },
+          "split_by": {
+            "type": "string",
+            "enum": [
+              "tool",
+              "operation",
+              "fixture",
+              "none"
+            ]
+          },
+          "output_dir": {
+            "type": "string"
+          },
+          "prefix": {
+            "type": "string"
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "overwrite": {
+            "type": "boolean"
+          },
+          "doc": {
+            "type": "string",
+            "description": "Document name; defaults to the active document."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "cam_tool_add",
+      "description": "Add a tool controller to a job (or edit an existing one with 'reuse'): bit shape (endmill, v-bit, ballend, bullnose, drill, chamfer...), geometry and real feeds/speeds. GRBL has no tool changer, so plan on one posted file per tool number.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "job": {
+            "type": "string",
+            "description": "CAM job name or label; optional when the document has only one."
+          },
+          "reuse": {
+            "type": "string",
+            "description": "Edit this existing controller instead of creating one."
+          },
+          "shape": {
+            "type": "string",
+            "description": "Tool bit shape id (default 'endmill'; 'v-bit' for V)."
+          },
+          "label": {
+            "type": "string"
+          },
+          "bit_label": {
+            "type": "string"
+          },
+          "number": {
+            "type": "integer",
+            "description": "Tool number (T word)."
+          },
+          "diameter": {
+            "type": "number"
+          },
+          "cutting_edge_angle": {
+            "type": "number",
+            "description": "V-bit full angle, degrees."
+          },
+          "tip_diameter": {
+            "type": "number"
+          },
+          "cutting_edge_height": {
+            "type": "number"
+          },
+          "length": {
+            "type": "number"
+          },
+          "shank_diameter": {
+            "type": "number"
+          },
+          "flutes": {
+            "type": "integer"
+          },
+          "horiz_feed": {
+            "type": "number",
+            "description": "mm/min."
+          },
+          "vert_feed": {
+            "type": "number",
+            "description": "mm/min (plunge)."
+          },
+          "horiz_rapid": {
+            "type": "number"
+          },
+          "vert_rapid": {
+            "type": "number"
+          },
+          "spindle_speed": {
+            "type": "number",
+            "description": "rpm."
+          },
+          "doc": {
+            "type": "string",
+            "description": "Document name; defaults to the active document."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "fc_api_help",
+      "description": "Live introspection of the running FreeCAD instead of guessing API names. Pass 'module' (e.g. 'PartDesign') for its public attributes with one-line docs; 'module'+'name' for one attribute; or a TypeId in 'name' (e.g. 'PartDesign::Pad', 'TechDraw::DrawViewPart', 'Assembly::JointObject') for its property list with types and documentation. TypeId probing creates nothing permanent: it uses a transaction that is rolled back. 'query' filters case-insensitively.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "module": {
+            "type": "string",
+            "description": "Python module name."
+          },
+          "name": {
+            "type": "string",
+            "description": "Attribute name, or a TypeId containing '::'."
+          },
+          "query": {
+            "type": "string",
+            "description": "Case-insensitive filter."
+          },
+          "force": {
+            "type": "boolean",
+            "description": "Import a module flagged unsafe headless (Draft). It can abort the FreeCAD session; default false."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "fc_check",
+      "description": "Geometry health of one object: isValid, isClosed, element counts, tolerance, and a non-destructive fix() report run on a copy. 'ok' is false when the shape is invalid, open or has no solid.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Object name or unique label."
+          },
+          "doc": {
+            "type": "string",
+            "description": "Document name; defaults to the active document."
+          },
+          "precision": {
+            "type": "number"
+          },
+          "min_tolerance": {
+            "type": "number"
+          },
+          "max_tolerance": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "fc_doc_list",
+      "description": "List open documents (name, label, file, modified, object count).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "fc_doc_new",
+      "description": "Create a new empty document and make it active.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Document name."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "fc_doc_open",
+      "description": "Open an existing .FCStd file and make it active.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute path to the .FCStd file."
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "fc_doc_save_as",
+      "description": "Save the document to a NEW path. Never overwrites an existing file unless overwrite is true, and never saves over the user's original file implicitly.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Destination .FCStd path."
+          },
+          "doc": {
+            "type": "string",
+            "description": "Document name; defaults to the active document."
+          },
+          "overwrite": {
+            "type": "boolean",
+            "description": "Allow replacing an existing file. Default false."
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "fc_exec",
+      "description": "Run Python inside the live FreeCAD. Bound names: App (FreeCAD), Gui (None when headless), doc (the target document), Part, Sketcher. Set a variable named _result to return a value. stdout/stderr are captured; on failure the traceback comes back verbatim and the whole call is rolled back as one transaction. This is the universal path: every workbench (PartDesign, Assembly, TechDraw, CAM, Draft, FEM...) is scriptable here \u2014 call fc_workbenches and fc_recipes first if you are unsure of the API.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Python source to execute."
+          },
+          "doc": {
+            "type": "string",
+            "description": "Document name; defaults to the active document."
+          },
+          "transaction_name": {
+            "type": "string",
+            "description": "Label shown in FreeCAD's undo stack for this step."
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "fc_export",
+      "description": "Export objects to STEP, STL, OBJ, IGES or BREP. Without a path the file lands in ~/.cache/freecad-ai-bridge/. An existing file is never replaced unless overwrite is true.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "objects": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Object names; empty means the whole document."
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "step",
+              "stl",
+              "obj",
+              "iges",
+              "brep"
+            ]
+          },
+          "path": {
+            "type": "string",
+            "description": "Destination file path."
+          },
+          "doc": {
+            "type": "string",
+            "description": "Document name; defaults to the active document."
+          },
+          "overwrite": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "format"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "fc_measure",
+      "description": "Measure objects: bbox, volume (mm3), area (mm2), distance between two shapes, or center of mass. Use it to prove the model matches the requested dimensions.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "bbox",
+              "volume",
+              "area",
+              "distance",
+              "center_of_mass"
+            ]
+          },
+          "objects": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Object names (two for 'distance')."
+          },
+          "doc": {
+            "type": "string",
+            "description": "Document name; defaults to the active document."
+          }
+        },
+        "required": [
+          "kind",
+          "objects"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "fc_object_get",
+      "description": "Full detail of one object: typed properties, dependencies and a shape summary (volume, area, bbox, center of mass, validity, element counts). Shapes are summarized, never dumped.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Internal object name (or unique label)."
+          },
+          "doc": {
+            "type": "string",
+            "description": "Document name; defaults to the active document."
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "fc_recipes",
+      "description": "Curated snippets per workbench (partdesign, assembly, techdraw, cam, part), verified headless on this FreeCAD build. Without arguments it lists what is available. Read the recipe before writing fc_exec code for a workbench for the first time \u2014 it encodes the API sequence and the known GUI-only limitations.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "workbench": {
+            "type": "string",
+            "description": "Recipe name, e.g. 'partdesign'."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "fc_recompute",
+      "description": "Recompute the document and report every object left touched, invalid or in error (with FreeCAD's status string). Run this after every build step.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "doc": {
+            "type": "string",
+            "description": "Document name; defaults to the active document."
+          },
+          "force": {
+            "type": "boolean",
+            "description": "Touch every object first and force a full recompute."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "fc_redo",
+      "description": "Redo previously undone transaction(s).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "steps": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "How many steps. Default 1."
+          },
+          "doc": {
+            "type": "string",
+            "description": "Document name; defaults to the active document."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "fc_screenshot",
+      "description": "Capture the 3D view as a PNG under ~/.cache/freecad-ai-bridge/ (GUI sessions only; headless returns available:false). Use it as a sanity check after the numeric validation, not instead of it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "view": {
+            "type": "string",
+            "enum": [
+              "axonometric",
+              "back",
+              "bottom",
+              "front",
+              "iso",
+              "isometric",
+              "left",
+              "rear",
+              "right",
+              "top"
+            ],
+            "description": "Camera preset. Default 'iso'."
+          },
+          "width": {
+            "type": "integer",
+            "minimum": 64
+          },
+          "height": {
+            "type": "integer",
+            "minimum": 64
+          },
+          "fit": {
+            "type": "boolean",
+            "description": "Fit all objects. Default true."
+          },
+          "background": {
+            "type": "string",
+            "description": "'White', 'Black', 'Transparent' or 'Current'."
+          },
+          "path": {
+            "type": "string",
+            "description": "Optional destination PNG path."
+          },
+          "doc": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "fc_sketch_summary",
+      "description": "Everything about a sketch: geometry, constraints, degrees of freedom after solve(), fully-constrained flag and any conflicting, redundant or malformed constraints. DoF 0 with no conflicts is the success condition for a finished sketch.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Sketch name or unique label."
+          },
+          "doc": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "fc_status",
+      "description": "FreeCAD version, GUI or headless, active document, open documents and bridge server uptime. Call this first.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "fc_tree",
+      "description": "Object tree of a document: name, label, type, parents, state, visibility and bounding box (mm). Start here to see what exists.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "doc": {
+            "type": "string",
+            "description": "Document name; defaults to the active document."
+          },
+          "depth": {
+            "type": "integer",
+            "description": "Maximum nesting depth. Default 6.",
+            "minimum": 1
+          },
+          "bbox": {
+            "type": "boolean",
+            "description": "Include bounding boxes. Default true."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "fc_undo",
+      "description": "Undo the last transaction(s) \u2014 each bridge call is one entry \u2014 and report the resulting undo/redo stacks.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "steps": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "How many steps. Default 1."
+          },
+          "doc": {
+            "type": "string",
+            "description": "Document name; defaults to the active document."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "fc_workbenches",
+      "description": "Which FreeCAD workbenches/modules can actually be imported in THIS session (PartDesign, Sketcher, Assembly, TechDraw, CAM/Path, Mesh, Draft, Spreadsheet, FEM...), with versions and GUI caveats. Call it before using a workbench you have not used yet in this session.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,709 @@
+{
+  "generated_at": "2026-09-03 15:27:05",
+  "freecad": "1.1.3",
+  "post": "grbl",
+  "post_args": "--translate_drill",
+  "tools": {
+    "T1": {
+      "number": 1,
+      "shape": "endmill",
+      "label": "T1 endmill 3.175",
+      "diameter": 3.175,
+      "flutes": 2,
+      "horiz_feed": 600.0,
+      "vert_feed": 200.0,
+      "horiz_rapid": 2000.0,
+      "vert_rapid": 800.0,
+      "spindle_speed": 10000.0,
+      "step_down": 0.6,
+      "step_over": 40.0
+    },
+    "T2": {
+      "number": 2,
+      "shape": "v-bit",
+      "label": "T2 v-bit 30",
+      "diameter": 3.175,
+      "cutting_edge_angle": 30.0,
+      "tip_diameter": 0.1,
+      "cutting_edge_height": 6.0,
+      "horiz_feed": 400.0,
+      "vert_feed": 150.0,
+      "horiz_rapid": 2000.0,
+      "vert_rapid": 800.0,
+      "spindle_speed": 10000.0
+    }
+  },
+  "safe_height_mm": 5.0,
+  "clearance_height_mm": 8.0,
+  "z_floor_mm": -2.9000000000000004,
+  "z_check_limit_mm": -3.1,
+  "blocks": [
+    {
+      "face": "anverso",
+      "value": "1",
+      "diameter_mm": 34.0,
+      "block_side_mm": 50.0,
+      "job": "Job_anverso",
+      "cavity_floor_face": 8,
+      "operations": [
+        {
+          "operation": "op1_cavity_anverso",
+          "type": "pocket_shape",
+          "tool_number": 1,
+          "commands": 324,
+          "z_min": -1.8,
+          "z_max": 8.0,
+          "x_min": -15.4083,
+          "x_max": 15.4083,
+          "StartDepth": 0.0,
+          "FinalDepth": -1.8,
+          "cycle_time": "00:09:07"
+        },
+        {
+          "operation": "op2_relief_anverso",
+          "type": "vcarve",
+          "tool_number": 2,
+          "commands": 6362,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": -11.6083,
+          "x_max": 11.774,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.9,
+          "cycle_time": "00:21:01"
+        },
+        {
+          "operation": "op3_pearls_anverso",
+          "type": "drilling",
+          "tool_number": 2,
+          "commands": 112,
+          "z_min": -2.35,
+          "z_max": 8.0,
+          "x_min": -14.4,
+          "x_max": 14.4,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.35,
+          "cycle_time": "00:00:04"
+        },
+        {
+          "operation": "op4_serration_anverso",
+          "type": "engrave",
+          "tool_number": 2,
+          "commands": 782,
+          "z_min": -2.3,
+          "z_max": 8.0,
+          "x_min": -17.0,
+          "x_max": 17.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.3,
+          "cycle_time": "00:08:50"
+        }
+      ],
+      "job_estimated_seconds": 1839.7,
+      "pearl_plunges": 52,
+      "serration_notches": 130,
+      "gcode": [
+        {
+          "file": "anverso-1-op1-T1-endmill3175.gcode",
+          "ok": true,
+          "lines": 348,
+          "z_min": -1.8,
+          "z_max": 8.0,
+          "x_min": -15.4116,
+          "x_max": 15.4116,
+          "y_min": -15.4116,
+          "y_max": 15.4116,
+          "tools": [
+            1
+          ],
+          "estimated_seconds": 375.3,
+          "moves": {
+            "rapid": 158,
+            "feed": 52,
+            "arc": 112,
+            "plunges": 0,
+            "drill_cycles": 0
+          }
+        },
+        {
+          "file": "anverso-1-op2_4-T2-vbit30.gcode",
+          "ok": true,
+          "lines": 7442,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": -17.0,
+          "x_max": 17.0,
+          "y_min": -16.995,
+          "y_max": 16.995,
+          "tools": [
+            2
+          ],
+          "estimated_seconds": 1715.0,
+          "moves": {
+            "rapid": 1339,
+            "feed": 6014,
+            "arc": 0,
+            "plunges": 52,
+            "drill_cycles": 0
+          }
+        }
+      ]
+    },
+    {
+      "face": "reverso",
+      "value": "1",
+      "diameter_mm": 34.0,
+      "block_side_mm": 50.0,
+      "job": "Job_reverso",
+      "cavity_floor_face": 8,
+      "operations": [
+        {
+          "operation": "op1_cavity_reverso",
+          "type": "pocket_shape",
+          "tool_number": 1,
+          "commands": 324,
+          "z_min": -1.8,
+          "z_max": 8.0,
+          "x_min": -15.4083,
+          "x_max": 15.4083,
+          "StartDepth": 0.0,
+          "FinalDepth": -1.8,
+          "cycle_time": "00:09:07"
+        },
+        {
+          "operation": "op2_relief_reverso",
+          "type": "vcarve",
+          "tool_number": 2,
+          "commands": 5210,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": -12.812,
+          "x_max": 12.879,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.9,
+          "cycle_time": "00:20:58"
+        },
+        {
+          "operation": "op3_pearls_reverso",
+          "type": "drilling",
+          "tool_number": 2,
+          "commands": 112,
+          "z_min": -2.35,
+          "z_max": 8.0,
+          "x_min": -14.4,
+          "x_max": 14.4,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.35,
+          "cycle_time": "00:00:04"
+        },
+        {
+          "operation": "op4_serration_reverso",
+          "type": "engrave",
+          "tool_number": 2,
+          "commands": 782,
+          "z_min": -2.3,
+          "z_max": 8.0,
+          "x_min": -17.0,
+          "x_max": 17.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.3,
+          "cycle_time": "00:08:50"
+        }
+      ],
+      "job_estimated_seconds": 1855.7,
+      "pearl_plunges": 52,
+      "serration_notches": 130,
+      "gcode": [
+        {
+          "file": "reverso-1-op1-T1-endmill3175.gcode",
+          "ok": true,
+          "lines": 348,
+          "z_min": -1.8,
+          "z_max": 8.0,
+          "x_min": -15.4116,
+          "x_max": 15.4116,
+          "y_min": -15.4116,
+          "y_max": 15.4116,
+          "tools": [
+            1
+          ],
+          "estimated_seconds": 375.3,
+          "moves": {
+            "rapid": 158,
+            "feed": 52,
+            "arc": 112,
+            "plunges": 0,
+            "drill_cycles": 0
+          }
+        },
+        {
+          "file": "reverso-1-op2_4-T2-vbit30.gcode",
+          "ok": true,
+          "lines": 6290,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": -17.0,
+          "x_max": 17.0,
+          "y_min": -16.995,
+          "y_max": 16.995,
+          "tools": [
+            2
+          ],
+          "estimated_seconds": 1731.0,
+          "moves": {
+            "rapid": 1347,
+            "feed": 4854,
+            "arc": 0,
+            "plunges": 52,
+            "drill_cycles": 0
+          }
+        }
+      ]
+    },
+    {
+      "face": "anverso",
+      "value": "5",
+      "diameter_mm": 37.0,
+      "block_side_mm": 53.0,
+      "job": "Job_anverso",
+      "cavity_floor_face": 8,
+      "operations": [
+        {
+          "operation": "op1_cavity_anverso",
+          "type": "pocket_shape",
+          "tool_number": 1,
+          "commands": 356,
+          "z_min": -1.8,
+          "z_max": 8.0,
+          "x_min": -16.9059,
+          "x_max": 16.9059,
+          "StartDepth": 0.0,
+          "FinalDepth": -1.8,
+          "cycle_time": "00:10:19"
+        },
+        {
+          "operation": "op2_relief_anverso",
+          "type": "vcarve",
+          "tool_number": 2,
+          "commands": 6847,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": -12.6324,
+          "x_max": 12.813,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.9,
+          "cycle_time": "00:22:02"
+        },
+        {
+          "operation": "op3_pearls_anverso",
+          "type": "drilling",
+          "tool_number": 2,
+          "commands": 112,
+          "z_min": -2.35,
+          "z_max": 8.0,
+          "x_min": -15.9,
+          "x_max": 15.9,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.35,
+          "cycle_time": "00:00:05"
+        },
+        {
+          "operation": "op4_serration_anverso",
+          "type": "engrave",
+          "tool_number": 2,
+          "commands": 782,
+          "z_min": -2.3,
+          "z_max": 8.0,
+          "x_min": -18.5,
+          "x_max": 18.5,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.3,
+          "cycle_time": "00:08:50"
+        }
+      ],
+      "job_estimated_seconds": 1937.9,
+      "pearl_plunges": 52,
+      "serration_notches": 130,
+      "gcode": [
+        {
+          "file": "anverso-5-op1-T1-endmill3175.gcode",
+          "ok": true,
+          "lines": 380,
+          "z_min": -1.8,
+          "z_max": 8.0,
+          "x_min": -16.9116,
+          "x_max": 16.9116,
+          "y_min": -16.9116,
+          "y_max": 16.9116,
+          "tools": [
+            1
+          ],
+          "estimated_seconds": 434.7,
+          "moves": {
+            "rapid": 170,
+            "feed": 56,
+            "arc": 128,
+            "plunges": 0,
+            "drill_cycles": 0
+          }
+        },
+        {
+          "file": "anverso-5-op2_4-T2-vbit30.gcode",
+          "ok": true,
+          "lines": 7927,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": -18.5,
+          "x_max": 18.5,
+          "y_min": -18.495,
+          "y_max": 18.495,
+          "tools": [
+            2
+          ],
+          "estimated_seconds": 1768.1,
+          "moves": {
+            "rapid": 1363,
+            "feed": 6475,
+            "arc": 0,
+            "plunges": 52,
+            "drill_cycles": 0
+          }
+        }
+      ]
+    },
+    {
+      "face": "reverso",
+      "value": "5",
+      "diameter_mm": 37.0,
+      "block_side_mm": 53.0,
+      "job": "Job_reverso",
+      "cavity_floor_face": 8,
+      "operations": [
+        {
+          "operation": "op1_cavity_reverso",
+          "type": "pocket_shape",
+          "tool_number": 1,
+          "commands": 356,
+          "z_min": -1.8,
+          "z_max": 8.0,
+          "x_min": -16.9059,
+          "x_max": 16.9059,
+          "StartDepth": 0.0,
+          "FinalDepth": -1.8,
+          "cycle_time": "00:10:19"
+        },
+        {
+          "operation": "op2_relief_reverso",
+          "type": "vcarve",
+          "tool_number": 2,
+          "commands": 6244,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": -13.943,
+          "x_max": 14.016,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.9,
+          "cycle_time": "00:24:16"
+        },
+        {
+          "operation": "op3_pearls_reverso",
+          "type": "drilling",
+          "tool_number": 2,
+          "commands": 112,
+          "z_min": -2.35,
+          "z_max": 8.0,
+          "x_min": -15.9,
+          "x_max": 15.9,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.35,
+          "cycle_time": "00:00:05"
+        },
+        {
+          "operation": "op4_serration_reverso",
+          "type": "engrave",
+          "tool_number": 2,
+          "commands": 782,
+          "z_min": -2.3,
+          "z_max": 8.0,
+          "x_min": -18.5,
+          "x_max": 18.5,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.3,
+          "cycle_time": "00:08:50"
+        }
+      ],
+      "job_estimated_seconds": 2074.3,
+      "pearl_plunges": 52,
+      "serration_notches": 130,
+      "gcode": [
+        {
+          "file": "reverso-5-op1-T1-endmill3175.gcode",
+          "ok": true,
+          "lines": 380,
+          "z_min": -1.8,
+          "z_max": 8.0,
+          "x_min": -16.9116,
+          "x_max": 16.9116,
+          "y_min": -16.9116,
+          "y_max": 16.9116,
+          "tools": [
+            1
+          ],
+          "estimated_seconds": 434.7,
+          "moves": {
+            "rapid": 170,
+            "feed": 56,
+            "arc": 128,
+            "plunges": 0,
+            "drill_cycles": 0
+          }
+        },
+        {
+          "file": "reverso-5-op2_4-T2-vbit30.gcode",
+          "ok": true,
+          "lines": 7324,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": -18.5,
+          "x_max": 18.5,
+          "y_min": -18.495,
+          "y_max": 18.495,
+          "tools": [
+            2
+          ],
+          "estimated_seconds": 1904.6,
+          "moves": {
+            "rapid": 1445,
+            "feed": 5790,
+            "arc": 0,
+            "plunges": 52,
+            "drill_cycles": 0
+          }
+        }
+      ]
+    },
+    {
+      "face": "anverso",
+      "value": "10",
+      "diameter_mm": 40.0,
+      "block_side_mm": 56.0,
+      "job": "Job_anverso",
+      "cavity_floor_face": 8,
+      "operations": [
+        {
+          "operation": "op1_cavity_anverso",
+          "type": "pocket_shape",
+          "tool_number": 1,
+          "commands": 380,
+          "z_min": -1.8,
+          "z_max": 8.0,
+          "x_min": -18.4026,
+          "x_max": 18.4026,
+          "StartDepth": 0.0,
+          "FinalDepth": -1.8,
+          "cycle_time": "00:11:36"
+        },
+        {
+          "operation": "op2_relief_anverso",
+          "type": "vcarve",
+          "tool_number": 2,
+          "commands": 7361,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": -13.6569,
+          "x_max": 13.852,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.9,
+          "cycle_time": "00:25:39"
+        },
+        {
+          "operation": "op3_pearls_anverso",
+          "type": "drilling",
+          "tool_number": 2,
+          "commands": 112,
+          "z_min": -2.35,
+          "z_max": 8.0,
+          "x_min": -17.4,
+          "x_max": 17.4,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.35,
+          "cycle_time": "00:00:05"
+        },
+        {
+          "operation": "op4_serration_anverso",
+          "type": "engrave",
+          "tool_number": 2,
+          "commands": 782,
+          "z_min": -2.3,
+          "z_max": 8.0,
+          "x_min": -20.0,
+          "x_max": 20.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.3,
+          "cycle_time": "00:08:50"
+        }
+      ],
+      "job_estimated_seconds": 2172.6,
+      "pearl_plunges": 52,
+      "serration_notches": 130,
+      "gcode": [
+        {
+          "file": "anverso-10-op1-T1-endmill3175.gcode",
+          "ok": true,
+          "lines": 404,
+          "z_min": -1.8,
+          "z_max": 8.0,
+          "x_min": -18.4122,
+          "x_max": 18.4122,
+          "y_min": -18.4122,
+          "y_max": 18.4122,
+          "tools": [
+            1
+          ],
+          "estimated_seconds": 498.3,
+          "moves": {
+            "rapid": 182,
+            "feed": 60,
+            "arc": 136,
+            "plunges": 0,
+            "drill_cycles": 0
+          }
+        },
+        {
+          "file": "anverso-10-op2_4-T2-vbit30.gcode",
+          "ok": true,
+          "lines": 8441,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": -20.0,
+          "x_max": 20.0,
+          "y_min": -19.994,
+          "y_max": 19.994,
+          "tools": [
+            2
+          ],
+          "estimated_seconds": 1954.8,
+          "moves": {
+            "rapid": 1469,
+            "feed": 6883,
+            "arc": 0,
+            "plunges": 52,
+            "drill_cycles": 0
+          }
+        }
+      ]
+    },
+    {
+      "face": "reverso",
+      "value": "10",
+      "diameter_mm": 40.0,
+      "block_side_mm": 56.0,
+      "job": "Job_reverso",
+      "cavity_floor_face": 8,
+      "operations": [
+        {
+          "operation": "op1_cavity_reverso",
+          "type": "pocket_shape",
+          "tool_number": 1,
+          "commands": 380,
+          "z_min": -1.8,
+          "z_max": 8.0,
+          "x_min": -18.4026,
+          "x_max": 18.4026,
+          "StartDepth": 0.0,
+          "FinalDepth": -1.8,
+          "cycle_time": "00:11:36"
+        },
+        {
+          "operation": "op2_relief_reverso",
+          "type": "vcarve",
+          "tool_number": 2,
+          "commands": 9265,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": -15.073,
+          "x_max": 15.152,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.9,
+          "cycle_time": "00:34:14"
+        },
+        {
+          "operation": "op3_pearls_reverso",
+          "type": "drilling",
+          "tool_number": 2,
+          "commands": 112,
+          "z_min": -2.35,
+          "z_max": 8.0,
+          "x_min": -17.4,
+          "x_max": 17.4,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.35,
+          "cycle_time": "00:00:05"
+        },
+        {
+          "operation": "op4_serration_reverso",
+          "type": "engrave",
+          "tool_number": 2,
+          "commands": 782,
+          "z_min": -2.3,
+          "z_max": 8.0,
+          "x_min": -20.0,
+          "x_max": 20.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.3,
+          "cycle_time": "00:08:50"
+        }
+      ],
+      "job_estimated_seconds": 2642.5,
+      "pearl_plunges": 52,
+      "serration_notches": 130,
+      "gcode": [
+        {
+          "file": "reverso-10-op1-T1-endmill3175.gcode",
+          "ok": true,
+          "lines": 404,
+          "z_min": -1.8,
+          "z_max": 8.0,
+          "x_min": -18.4122,
+          "x_max": 18.4122,
+          "y_min": -18.4122,
+          "y_max": 18.4122,
+          "tools": [
+            1
+          ],
+          "estimated_seconds": 498.3,
+          "moves": {
+            "rapid": 182,
+            "feed": 60,
+            "arc": 136,
+            "plunges": 0,
+            "drill_cycles": 0
+          }
+        },
+        {
+          "file": "reverso-10-op2_4-T2-vbit30.gcode",
+          "ok": true,
+          "lines": 10345,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": -20.0,
+          "x_max": 20.0,
+          "y_min": -19.994,
+          "y_max": 19.994,
+          "tools": [
+            2
+          ],
+          "estimated_seconds": 2424.7,
+          "moves": {
+            "rapid": 1753,
+            "feed": 8503,
+            "arc": 0,
+            "plunges": 52,
+            "drill_cycles": 0
+          }
+        }
+      ]
+    }
+  ],
+  "seconds": 84.7
+}

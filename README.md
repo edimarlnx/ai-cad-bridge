@@ -25,7 +25,10 @@ Claude Code / Codex ──stdio (MCP JSON-RPC)──▶ bridge/freecad_mcp.py   
 
 Two processes, both stdlib. The add-on generates a bearer token on first start
 and writes it with the port to `~/.config/freecad-ai-bridge/config.json` (mode
-0600); the MCP server reads the same file, so there is no secret to copy.
+0600); the MCP server reads the same file, so there is no secret to copy. The
+port can change between runs — if 8765 is still held by a previous FreeCAD
+process the server binds a free one and records it — so always trust
+`config.json` (and `fc_status`) rather than the default.
 
 ## Install
 
@@ -115,6 +118,31 @@ numbers reported back.
 | `fc_workbenches` | which workbenches this build can use |
 | `fc_api_help` | live introspection of modules, attributes and TypeIds |
 | `fc_recipes` | verified snippets per workbench |
+| `cam_job_create` | CAM job on one or more solids: stock, SetupSheet, first tool |
+| `cam_tool_add` | tool controller: bit shape and geometry, feeds in mm/min, rpm |
+| `cam_op_add` | operation: pocket, profile, vcarve, drilling, engrave, adaptive… |
+| `cam_inspect` | toolpaths read back: counts, Z range, XY bounds, cut length, time |
+| `cam_postprocess` | G-code files through a post processor, one per tool if asked |
+| `cam_gcode_check` | re-parse the G-code: bounds, depth, safe rapids, spindle, tools |
+
+### From model to machine
+
+The CAM tools are the point of the whole thing: a model is only done when a
+machine can cut it. `cam_op_add` writes depths that actually stick (FreeCAD
+binds SetupSheet *expressions* to `FinalDepth` and friends, so a plain
+assignment is silently reverted), `cam_postprocess` splits the output per tool
+because GRBL has no tool changer, and `cam_gcode_check` re-reads the posted file
+with no FreeCAD involved — XY inside the stock (arcs bounded by their sweep, not
+their end points), Z never below the floor you give it, rapid XY moves only at
+or above the safe height, spindle on before the first cut, tool numbers as
+expected. `freecad/AiBridge/recipes/cam.md` documents the API landmines behind
+each of those.
+
+`examples/moeda-zcloud/` is the proof: `bash examples/moeda-zcloud/run.sh`
+exports six coin faces with openscad, builds six mold blocks with cavity,
+V-carved relief, 52 pearl dimples and 130 serration notches each, and posts
+twelve GRBL files — all of them passing `cam_gcode_check`, with a generated
+README carrying the zero convention, feeds, run order and the validation table.
 
 Everything FreeCAD does is reachable: `fc_exec` runs any FreeCAD Python, and the
 knowledge tools plus the recipes under `freecad/AiBridge/recipes/` (PartDesign,
@@ -149,15 +177,30 @@ bash tests/run.sh
 GUI) and drives every tool over HTTP: builds a box with `fc_exec`, recomputes,
 reads the tree, measures 1000 mm³, checks validity, summarizes a sketch,
 exports STL, undoes and redoes, probes `PartDesign::Pad`, reads a recipe and
-saves the document. `tests/test_mcp_stdio.py` drives the MCP server over pipes
+saves the document, then runs a full CAM path (job on a box, a pocket, GRBL
+post-processing, and the G-code parser accepting the good file and rejecting a
+handmade bad one). `tests/test_mcp_stdio.py` drives the MCP server over pipes
 against a fake add-on, including the offline fallback. Test scripts must live
 under `$HOME`: the Flatpak sandbox cannot see `/tmp`.
+
+The offline fallback catalogue is generated, not hand-written — a client caches
+the schemas it receives at connect time, so they have to be the real ones:
+
+```bash
+flatpak run --command=FreeCADCmd org.freecad.FreeCAD bridge/gen_fallback.py
+```
+
+Re-run it whenever a tool's schema changes; it rewrites `bridge/fallback_tools.json`.
 
 ## Known limitations on FreeCAD 1.1.3
 
 * Page-level SVG/PDF export in TechDraw lives in `TechDrawGui`, so headless
   sessions only get DXF (`TechDraw.writeDXFPage`) and per-view SVG/DXF strings.
-* Importing `Draft` from inside a bridge request aborts a *headless* FreeCAD
-  (it pulls Qt). `fc_workbenches` therefore reports it without importing it, and
-  `fc_api_help` refuses to import it headless unless you pass `force: true`.
+* Importing `Draft` in a headless session aborts FreeCAD **once `FreeCADGui` has
+  been imported**: that half-registers the Qt resource system and Draft's
+  preference loader then reads `:/ui/*.ui` straight into a SIGSEGV. The bridge
+  never touches `FreeCADGui` unless `FreeCAD.GuiUp` is true, which is what lets
+  `cam_job_create` work headless (CAM's `Job.Create` calls `Draft.clone`).
+  `fc_workbenches` still reports Draft without importing it, and `fc_api_help`
+  refuses to import it headless unless you pass `force: true`.
 * Screenshots need a GUI session.

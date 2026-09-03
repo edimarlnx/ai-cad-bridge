@@ -261,13 +261,15 @@ def start(port=None):
         config = ensure_config(port=port)
         # With a GUI, park the main-thread invoker now, while we ARE on the
         # main thread (the workbench command), so worker threads only emit.
-        try:
-            import FreeCADGui
-
-            if FreeCADGui.getMainWindow() is not None:
+        # Never import FreeCADGui when no GUI is up: under FreeCADCmd that
+        # half-registers the Qt resource system and a later "import Draft"
+        # (CAM's Job.Create does one) SIGSEGVs the process. dispatch.gui_module()
+        # guards on FreeCAD.GuiUp for the same reason.
+        if dispatch.gui_module() is not None:
+            try:
                 dispatch._main_thread_invoker()
-        except Exception:
-            pass
+            except Exception:
+                pass
         httpd = ThreadingHTTPServer(("127.0.0.1", config["port"]), _Handler)
         httpd.daemon_threads = True
         # A port of 0 means "pick one"; record the real one in the config.
