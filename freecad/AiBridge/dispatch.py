@@ -7,7 +7,7 @@ Two responsibilities:
    process (measured on 1.1.3). HTTP requests arrive on worker threads, so the
    handler is always marshalled to the main thread:
 
-   * with a GUI up, through the Qt event loop (``QTimer.singleShot``);
+   * with a GUI up, through the Qt event loop (queued signal to a main-thread QObject);
    * headless, through a queue that the main thread pumps
      (``install_main_thread_pump`` + ``pump_until``/``run_pump``, which is what
      ``server.serve()`` and the headless test use).
@@ -218,10 +218,43 @@ def _transaction_document(App, params):
     return App.ActiveDocument
 
 
-def _run_on_main_thread(function):
-    """Execute ``function`` on the Qt main thread and return its result."""
+_invoker = None
+
+
+def _main_thread_invoker():
+    """A QObject living on the Qt main thread whose signal queues callables.
+
+    ``QTimer.singleShot`` from an HTTP worker thread never fires: the timer is
+    owned by the calling thread, which has no Qt event loop. A queued signal
+    connection, on the other hand, is delivered on the thread that owns the
+    receiver object, so we park one QObject on the main thread and emit to it.
+    """
+    global _invoker
     from PySide import QtCore
 
+    if _invoker is not None:
+        return _invoker
+
+    class _Invoker(QtCore.QObject):
+        call = QtCore.Signal(object)
+
+        def __init__(self):
+            super().__init__()
+            self.call.connect(self._run, QtCore.Qt.QueuedConnection)
+
+        def _run(self, function):
+            function()
+
+    invoker = _Invoker()
+    app = QtCore.QCoreApplication.instance()
+    if app is not None and invoker.thread() is not app.thread():
+        invoker.moveToThread(app.thread())
+    _invoker = invoker
+    return invoker
+
+
+def _run_on_main_thread(function):
+    """Execute ``function`` on the Qt main thread and return its result."""
     box = {}
     done = threading.Event()
 
@@ -234,7 +267,7 @@ def _run_on_main_thread(function):
         finally:
             done.set()
 
-    QtCore.QTimer.singleShot(0, runner)
+    _main_thread_invoker().call.emit(runner)
     if not done.wait(MAIN_THREAD_TIMEOUT):
         raise ToolError(
             "timed out after %.0fs waiting for the FreeCAD main thread; "

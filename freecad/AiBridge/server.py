@@ -259,6 +259,15 @@ def start(port=None):
         if _state["httpd"] is not None:
             return status()
         config = ensure_config(port=port)
+        # With a GUI, park the main-thread invoker now, while we ARE on the
+        # main thread (the workbench command), so worker threads only emit.
+        try:
+            import FreeCADGui
+
+            if FreeCADGui.getMainWindow() is not None:
+                dispatch._main_thread_invoker()
+        except Exception:
+            pass
         httpd = ThreadingHTTPServer(("127.0.0.1", config["port"]), _Handler)
         httpd.daemon_threads = True
         # A port of 0 means "pick one"; record the real one in the config.
