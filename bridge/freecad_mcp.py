@@ -35,7 +35,10 @@ REQUEST_TIMEOUT = 180
 CONFIG_PATH = os.path.join(
     os.environ.get("AIBRIDGE_CONFIG_DIR")
     or os.path.join(
-        os.environ.get("XDG_CONFIG_HOME") or os.path.expanduser("~/.config"),
+        # Deliberately NOT XDG_CONFIG_HOME: inside the FreeCAD Flatpak it points at
+    # ~/.var/app/org.freecad.FreeCAD/config, so the host bridge would never find
+    # the file. HOME is the real home on both sides (the sandbox has host access).
+    os.path.expanduser("~/.config"),
         "freecad-ai-bridge",
     ),
     "config.json",
