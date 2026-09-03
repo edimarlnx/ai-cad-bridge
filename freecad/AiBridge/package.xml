@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<package format="1" xmlns="https://wiki.freecad.org/Package_Metadata">
+  <name>AI Bridge</name>
+  <description>
+    Local bridge that lets an AI coding agent (Claude Code, Codex CLI) work
+    inside a running FreeCAD. The add-on starts a loopback-only HTTP JSON-RPC
+    server; a stdlib MCP stdio server on the host proxies tool calls to it.
+    Every mutating tool runs on the GUI thread inside its own transaction, so a
+    single agent step is one undo. Nothing leaves the machine.
+  </description>
+  <version>0.1.0</version>
+  <date>2026-09-03</date>
+  <maintainer email="edimar@quave.com.br">Edimar (Zodo)</maintainer>
+  <license>LGPL-2.1-or-later</license>
+  <url type="repository" branch="main">https://github.com/zodo-dev/ai-cad-bridge</url>
+
+  <content>
+    <workbench>
+      <classname>AiBridgeWorkbench</classname>
+      <name>AI Bridge</name>
+      <description>
+        Start/stop the local AI bridge server and copy the agent registration
+        command.
+      </description>
+      <subdirectory>./</subdirectory>
+      <tag>ai</tag>
+      <tag>mcp</tag>
+      <tag>automation</tag>
+    </workbench>
+  </content>
+
+  <freecadmin>1.0</freecadmin>
+</package>
