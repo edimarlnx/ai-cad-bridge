@@ -1,0 +1,1047 @@
+{
+  "generated_at": "2026-09-04 20:19:40",
+  "freecad": "1.1.3",
+  "layout": "sheet2",
+  "block_height_mm": 10.0,
+  "post": "grbl",
+  "post_args": "--translate_drill",
+  "tools": {
+    "T1": {
+      "number": 1,
+      "shape": "endmill",
+      "label": "T1 endmill 3.175",
+      "diameter": 3.175,
+      "flutes": 2,
+      "horiz_feed": 600.0,
+      "vert_feed": 200.0,
+      "horiz_rapid": 2000.0,
+      "vert_rapid": 800.0,
+      "spindle_speed": 10000.0,
+      "step_down": 0.6,
+      "step_over": 40.0
+    },
+    "T2": {
+      "number": 2,
+      "shape": "v-bit",
+      "label": "T2 v-bit 30",
+      "diameter": 3.175,
+      "cutting_edge_angle": 30.0,
+      "tip_diameter": 0.1,
+      "cutting_edge_height": 6.0,
+      "horiz_feed": 400.0,
+      "vert_feed": 150.0,
+      "horiz_rapid": 2000.0,
+      "vert_rapid": 800.0,
+      "spindle_speed": 10000.0
+    }
+  },
+  "safe_height_mm": 5.0,
+  "clearance_height_mm": 8.0,
+  "z_floor_mm": -2.9000000000000004,
+  "z_check_limit_mm": -3.1,
+  "blocks": [
+    {
+      "layout": "sheet2",
+      "value": "1",
+      "diameter_mm": 34.0,
+      "block_side_mm": 100.0,
+      "block_height_mm": 10.0,
+      "cell_pitch_mm": 50.0,
+      "cells": [
+        {
+          "name": "c1",
+          "face": "anverso",
+          "strip": "A",
+          "x": -25.0,
+          "y": 25.0,
+          "floor_moves": 41
+        },
+        {
+          "name": "c2",
+          "face": "anverso",
+          "strip": "A",
+          "x": 25.0,
+          "y": 25.0,
+          "floor_moves": 41
+        },
+        {
+          "name": "c3",
+          "face": "reverso",
+          "strip": "B",
+          "x": -25.0,
+          "y": -25.0,
+          "floor_moves": 41
+        },
+        {
+          "name": "c4",
+          "face": "reverso",
+          "strip": "B",
+          "x": 25.0,
+          "y": -25.0,
+          "floor_moves": 41
+        }
+      ],
+      "pin_holes": {
+        "diameter_mm": 3.2,
+        "depth_mm": 6.0,
+        "peck_depth_mm": 1.5,
+        "operation": "op1b_pins",
+        "type": "drilling",
+        "bottom_points": 4,
+        "clearances": [
+          {
+            "name": "p1",
+            "strip": "A",
+            "x": -44.0,
+            "y": 6.0,
+            "to_block_edge_mm": 4.4,
+            "to_saw_line_mm": 4.4,
+            "to_cavity_edge_mm": 8.27
+          },
+          {
+            "name": "p2",
+            "strip": "A",
+            "x": 44.0,
+            "y": 6.0,
+            "to_block_edge_mm": 4.4,
+            "to_saw_line_mm": 4.4,
+            "to_cavity_edge_mm": 8.27
+          },
+          {
+            "name": "p3",
+            "strip": "B",
+            "x": -44.0,
+            "y": -6.0,
+            "to_block_edge_mm": 4.4,
+            "to_saw_line_mm": 4.4,
+            "to_cavity_edge_mm": 8.27
+          },
+          {
+            "name": "p4",
+            "strip": "B",
+            "x": 44.0,
+            "y": -6.0,
+            "to_block_edge_mm": 4.4,
+            "to_saw_line_mm": 4.4,
+            "to_cavity_edge_mm": 8.27
+          }
+        ]
+      },
+      "pin": {
+        "diameter_mm": 3.1,
+        "length_mm": 11.0,
+        "chamfer_mm": 0.5,
+        "count": 4
+      },
+      "job": "Job_sheet2",
+      "cavity_floor_faces": [
+        20,
+        22,
+        15,
+        17
+      ],
+      "operations": [
+        {
+          "operation": "op1_cavities",
+          "type": "pocket_shape",
+          "tool_number": 1,
+          "commands": 1290,
+          "z_min": -1.8,
+          "z_max": 8.0,
+          "x_min": -40.4083,
+          "x_max": 40.4083,
+          "StartDepth": 0.0,
+          "FinalDepth": -1.8,
+          "cycle_time": "00:28:34"
+        },
+        {
+          "operation": "op1b_pins",
+          "type": "drilling",
+          "tool_number": 1,
+          "commands": 16,
+          "z_min": -6.0,
+          "z_max": 8.0,
+          "x_min": -44.0,
+          "x_max": 44.0,
+          "StartDepth": 0.0,
+          "FinalDepth": -6.0,
+          "cycle_time": "00:00:23"
+        },
+        {
+          "operation": "op2_relief_c1",
+          "type": "vcarve",
+          "tool_number": 2,
+          "commands": 6362,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": -36.6083,
+          "x_max": 0.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.9,
+          "cycle_time": "00:21:25"
+        },
+        {
+          "operation": "op3_pearls_c1",
+          "type": "drilling",
+          "tool_number": 2,
+          "commands": 112,
+          "z_min": -2.35,
+          "z_max": 8.0,
+          "x_min": -39.4,
+          "x_max": 0.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.35,
+          "cycle_time": "00:00:04"
+        },
+        {
+          "operation": "op4_serration_c1",
+          "type": "engrave",
+          "tool_number": 2,
+          "commands": 782,
+          "z_min": -2.3,
+          "z_max": 8.0,
+          "x_min": -42.0,
+          "x_max": 0.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.3,
+          "cycle_time": "00:08:50"
+        },
+        {
+          "operation": "op2_relief_c2",
+          "type": "vcarve",
+          "tool_number": 2,
+          "commands": 6383,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": 0.0,
+          "x_max": 36.774,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.9,
+          "cycle_time": "00:21:30"
+        },
+        {
+          "operation": "op3_pearls_c2",
+          "type": "drilling",
+          "tool_number": 2,
+          "commands": 112,
+          "z_min": -2.35,
+          "z_max": 8.0,
+          "x_min": 0.0,
+          "x_max": 39.4,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.35,
+          "cycle_time": "00:00:04"
+        },
+        {
+          "operation": "op4_serration_c2",
+          "type": "engrave",
+          "tool_number": 2,
+          "commands": 782,
+          "z_min": -2.3,
+          "z_max": 8.0,
+          "x_min": 0.0,
+          "x_max": 42.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.3,
+          "cycle_time": "00:08:50"
+        },
+        {
+          "operation": "op2_relief_c3",
+          "type": "vcarve",
+          "tool_number": 2,
+          "commands": 5214,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": -37.879,
+          "x_max": 0.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.9,
+          "cycle_time": "00:20:54"
+        },
+        {
+          "operation": "op3_pearls_c3",
+          "type": "drilling",
+          "tool_number": 2,
+          "commands": 112,
+          "z_min": -2.35,
+          "z_max": 8.0,
+          "x_min": -39.4,
+          "x_max": 0.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.35,
+          "cycle_time": "00:00:04"
+        },
+        {
+          "operation": "op4_serration_c3",
+          "type": "engrave",
+          "tool_number": 2,
+          "commands": 782,
+          "z_min": -2.3,
+          "z_max": 8.0,
+          "x_min": -42.0,
+          "x_max": 0.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.3,
+          "cycle_time": "00:08:50"
+        },
+        {
+          "operation": "op2_relief_c4",
+          "type": "vcarve",
+          "tool_number": 2,
+          "commands": 5214,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": 0.0,
+          "x_max": 37.812,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.9,
+          "cycle_time": "00:21:00"
+        },
+        {
+          "operation": "op3_pearls_c4",
+          "type": "drilling",
+          "tool_number": 2,
+          "commands": 112,
+          "z_min": -2.35,
+          "z_max": 8.0,
+          "x_min": 0.0,
+          "x_max": 39.4,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.35,
+          "cycle_time": "00:00:04"
+        },
+        {
+          "operation": "op4_serration_c4",
+          "type": "engrave",
+          "tool_number": 2,
+          "commands": 782,
+          "z_min": -2.3,
+          "z_max": 8.0,
+          "x_min": 0.0,
+          "x_max": 42.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.3,
+          "cycle_time": "00:08:50"
+        }
+      ],
+      "job_estimated_seconds": 7447.0,
+      "pearl_plunges": 208,
+      "serration_notches": 520,
+      "gcode": [
+        {
+          "file": "sheet2-1-op1-T1-endmill3175.gcode",
+          "ok": true,
+          "lines": 1429,
+          "z_min": -6.0,
+          "z_max": 8.0,
+          "x_min": -44.0,
+          "x_max": 44.0,
+          "y_min": -40.4116,
+          "y_max": 40.4116,
+          "tools": [
+            1
+          ],
+          "estimated_seconds": 1537.1,
+          "moves": {
+            "rapid": 700,
+            "feed": 240,
+            "arc": 448,
+            "plunges": 32,
+            "drill_cycles": 0
+          }
+        },
+        {
+          "file": "sheet2-1-op2_4-T2-vbit30.gcode",
+          "ok": true,
+          "lines": 27430,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": -42.0,
+          "x_max": 42.0,
+          "y_min": -41.995,
+          "y_max": 41.995,
+          "tools": [
+            2
+          ],
+          "estimated_seconds": 6939.1,
+          "moves": {
+            "rapid": 5394,
+            "feed": 21743,
+            "arc": 0,
+            "plunges": 208,
+            "drill_cycles": 0
+          }
+        }
+      ]
+    },
+    {
+      "layout": "sheet2",
+      "value": "5",
+      "diameter_mm": 37.0,
+      "block_side_mm": 100.0,
+      "block_height_mm": 10.0,
+      "cell_pitch_mm": 50.0,
+      "cells": [
+        {
+          "name": "c1",
+          "face": "anverso",
+          "strip": "A",
+          "x": -25.0,
+          "y": 25.0,
+          "floor_moves": 46
+        },
+        {
+          "name": "c2",
+          "face": "anverso",
+          "strip": "A",
+          "x": 25.0,
+          "y": 25.0,
+          "floor_moves": 46
+        },
+        {
+          "name": "c3",
+          "face": "reverso",
+          "strip": "B",
+          "x": -25.0,
+          "y": -25.0,
+          "floor_moves": 46
+        },
+        {
+          "name": "c4",
+          "face": "reverso",
+          "strip": "B",
+          "x": 25.0,
+          "y": -25.0,
+          "floor_moves": 46
+        }
+      ],
+      "pin_holes": {
+        "diameter_mm": 3.2,
+        "depth_mm": 6.0,
+        "peck_depth_mm": 1.5,
+        "operation": "op1b_pins",
+        "type": "drilling",
+        "bottom_points": 4,
+        "clearances": [
+          {
+            "name": "p1",
+            "strip": "A",
+            "x": -44.0,
+            "y": 6.0,
+            "to_block_edge_mm": 4.4,
+            "to_saw_line_mm": 4.4,
+            "to_cavity_edge_mm": 6.77
+          },
+          {
+            "name": "p2",
+            "strip": "A",
+            "x": 44.0,
+            "y": 6.0,
+            "to_block_edge_mm": 4.4,
+            "to_saw_line_mm": 4.4,
+            "to_cavity_edge_mm": 6.77
+          },
+          {
+            "name": "p3",
+            "strip": "B",
+            "x": -44.0,
+            "y": -6.0,
+            "to_block_edge_mm": 4.4,
+            "to_saw_line_mm": 4.4,
+            "to_cavity_edge_mm": 6.77
+          },
+          {
+            "name": "p4",
+            "strip": "B",
+            "x": 44.0,
+            "y": -6.0,
+            "to_block_edge_mm": 4.4,
+            "to_saw_line_mm": 4.4,
+            "to_cavity_edge_mm": 6.77
+          }
+        ]
+      },
+      "pin": {
+        "diameter_mm": 3.1,
+        "length_mm": 11.0,
+        "chamfer_mm": 0.5,
+        "count": 4
+      },
+      "job": "Job_sheet2",
+      "cavity_floor_faces": [
+        20,
+        22,
+        15,
+        17
+      ],
+      "operations": [
+        {
+          "operation": "op1_cavities",
+          "type": "pocket_shape",
+          "tool_number": 1,
+          "commands": 1418,
+          "z_min": -1.8,
+          "z_max": 8.0,
+          "x_min": -41.9059,
+          "x_max": 41.9059,
+          "StartDepth": 0.0,
+          "FinalDepth": -1.8,
+          "cycle_time": "00:32:00"
+        },
+        {
+          "operation": "op1b_pins",
+          "type": "drilling",
+          "tool_number": 1,
+          "commands": 16,
+          "z_min": -6.0,
+          "z_max": 8.0,
+          "x_min": -44.0,
+          "x_max": 44.0,
+          "StartDepth": 0.0,
+          "FinalDepth": -6.0,
+          "cycle_time": "00:00:23"
+        },
+        {
+          "operation": "op2_relief_c1",
+          "type": "vcarve",
+          "tool_number": 2,
+          "commands": 6829,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": -37.6323,
+          "x_max": 0.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.9,
+          "cycle_time": "00:22:01"
+        },
+        {
+          "operation": "op3_pearls_c1",
+          "type": "drilling",
+          "tool_number": 2,
+          "commands": 112,
+          "z_min": -2.35,
+          "z_max": 8.0,
+          "x_min": -40.9,
+          "x_max": 0.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.35,
+          "cycle_time": "00:00:05"
+        },
+        {
+          "operation": "op4_serration_c1",
+          "type": "engrave",
+          "tool_number": 2,
+          "commands": 782,
+          "z_min": -2.3,
+          "z_max": 8.0,
+          "x_min": -43.5,
+          "x_max": 0.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.3,
+          "cycle_time": "00:08:50"
+        },
+        {
+          "operation": "op2_relief_c2",
+          "type": "vcarve",
+          "tool_number": 2,
+          "commands": 6850,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": 0.0,
+          "x_max": 37.813,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.9,
+          "cycle_time": "00:22:08"
+        },
+        {
+          "operation": "op3_pearls_c2",
+          "type": "drilling",
+          "tool_number": 2,
+          "commands": 112,
+          "z_min": -2.35,
+          "z_max": 8.0,
+          "x_min": 0.0,
+          "x_max": 40.9,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.35,
+          "cycle_time": "00:00:05"
+        },
+        {
+          "operation": "op4_serration_c2",
+          "type": "engrave",
+          "tool_number": 2,
+          "commands": 782,
+          "z_min": -2.3,
+          "z_max": 8.0,
+          "x_min": 0.0,
+          "x_max": 43.5,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.3,
+          "cycle_time": "00:08:50"
+        },
+        {
+          "operation": "op2_relief_c3",
+          "type": "vcarve",
+          "tool_number": 2,
+          "commands": 6266,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": -39.016,
+          "x_max": 0.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.9,
+          "cycle_time": "00:24:22"
+        },
+        {
+          "operation": "op3_pearls_c3",
+          "type": "drilling",
+          "tool_number": 2,
+          "commands": 112,
+          "z_min": -2.35,
+          "z_max": 8.0,
+          "x_min": -40.9,
+          "x_max": 0.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.35,
+          "cycle_time": "00:00:05"
+        },
+        {
+          "operation": "op4_serration_c3",
+          "type": "engrave",
+          "tool_number": 2,
+          "commands": 782,
+          "z_min": -2.3,
+          "z_max": 8.0,
+          "x_min": -43.5,
+          "x_max": 0.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.3,
+          "cycle_time": "00:08:50"
+        },
+        {
+          "operation": "op2_relief_c4",
+          "type": "vcarve",
+          "tool_number": 2,
+          "commands": 6264,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": 0.0,
+          "x_max": 38.943,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.9,
+          "cycle_time": "00:24:25"
+        },
+        {
+          "operation": "op3_pearls_c4",
+          "type": "drilling",
+          "tool_number": 2,
+          "commands": 112,
+          "z_min": -2.35,
+          "z_max": 8.0,
+          "x_min": 0.0,
+          "x_max": 40.9,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.35,
+          "cycle_time": "00:00:05"
+        },
+        {
+          "operation": "op4_serration_c4",
+          "type": "engrave",
+          "tool_number": 2,
+          "commands": 782,
+          "z_min": -2.3,
+          "z_max": 8.0,
+          "x_min": 0.0,
+          "x_max": 43.5,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.3,
+          "cycle_time": "00:08:50"
+        }
+      ],
+      "job_estimated_seconds": 8051.3,
+      "pearl_plunges": 208,
+      "serration_notches": 520,
+      "gcode": [
+        {
+          "file": "sheet2-5-op1-T1-endmill3175.gcode",
+          "ok": true,
+          "lines": 1557,
+          "z_min": -6.0,
+          "z_max": 8.0,
+          "x_min": -44.0,
+          "x_max": 44.0,
+          "y_min": -41.9116,
+          "y_max": 41.9116,
+          "tools": [
+            1
+          ],
+          "estimated_seconds": 1774.3,
+          "moves": {
+            "rapid": 748,
+            "feed": 256,
+            "arc": 512,
+            "plunges": 32,
+            "drill_cycles": 0
+          }
+        },
+        {
+          "file": "sheet2-5-op2_4-T2-vbit30.gcode",
+          "ok": true,
+          "lines": 30466,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": -43.5,
+          "x_max": 43.5,
+          "y_min": -43.495,
+          "y_max": 43.495,
+          "tools": [
+            2
+          ],
+          "estimated_seconds": 7364.2,
+          "moves": {
+            "rapid": 5624,
+            "feed": 24549,
+            "arc": 0,
+            "plunges": 208,
+            "drill_cycles": 0
+          }
+        }
+      ]
+    },
+    {
+      "layout": "sheet2",
+      "value": "10",
+      "diameter_mm": 40.0,
+      "block_side_mm": 100.0,
+      "block_height_mm": 10.0,
+      "cell_pitch_mm": 50.0,
+      "cells": [
+        {
+          "name": "c1",
+          "face": "anverso",
+          "strip": "A",
+          "x": -25.0,
+          "y": 25.0,
+          "floor_moves": 49
+        },
+        {
+          "name": "c2",
+          "face": "anverso",
+          "strip": "A",
+          "x": 25.0,
+          "y": 25.0,
+          "floor_moves": 49
+        },
+        {
+          "name": "c3",
+          "face": "reverso",
+          "strip": "B",
+          "x": -25.0,
+          "y": -25.0,
+          "floor_moves": 49
+        },
+        {
+          "name": "c4",
+          "face": "reverso",
+          "strip": "B",
+          "x": 25.0,
+          "y": -25.0,
+          "floor_moves": 49
+        }
+      ],
+      "pin_holes": {
+        "diameter_mm": 3.2,
+        "depth_mm": 6.0,
+        "peck_depth_mm": 1.5,
+        "operation": "op1b_pins",
+        "type": "drilling",
+        "bottom_points": 4,
+        "clearances": [
+          {
+            "name": "p1",
+            "strip": "A",
+            "x": -44.0,
+            "y": 6.0,
+            "to_block_edge_mm": 4.4,
+            "to_saw_line_mm": 4.4,
+            "to_cavity_edge_mm": 5.27
+          },
+          {
+            "name": "p2",
+            "strip": "A",
+            "x": 44.0,
+            "y": 6.0,
+            "to_block_edge_mm": 4.4,
+            "to_saw_line_mm": 4.4,
+            "to_cavity_edge_mm": 5.27
+          },
+          {
+            "name": "p3",
+            "strip": "B",
+            "x": -44.0,
+            "y": -6.0,
+            "to_block_edge_mm": 4.4,
+            "to_saw_line_mm": 4.4,
+            "to_cavity_edge_mm": 5.27
+          },
+          {
+            "name": "p4",
+            "strip": "B",
+            "x": 44.0,
+            "y": -6.0,
+            "to_block_edge_mm": 4.4,
+            "to_saw_line_mm": 4.4,
+            "to_cavity_edge_mm": 5.27
+          }
+        ]
+      },
+      "pin": {
+        "diameter_mm": 3.1,
+        "length_mm": 11.0,
+        "chamfer_mm": 0.5,
+        "count": 4
+      },
+      "job": "Job_sheet2",
+      "cavity_floor_faces": [
+        20,
+        22,
+        15,
+        17
+      ],
+      "operations": [
+        {
+          "operation": "op1_cavities",
+          "type": "pocket_shape",
+          "tool_number": 1,
+          "commands": 1514,
+          "z_min": -1.8,
+          "z_max": 8.0,
+          "x_min": -43.4026,
+          "x_max": 43.4026,
+          "StartDepth": 0.0,
+          "FinalDepth": -1.8,
+          "cycle_time": "00:35:38"
+        },
+        {
+          "operation": "op1b_pins",
+          "type": "drilling",
+          "tool_number": 1,
+          "commands": 16,
+          "z_min": -6.0,
+          "z_max": 8.0,
+          "x_min": -44.0,
+          "x_max": 44.0,
+          "StartDepth": 0.0,
+          "FinalDepth": -6.0,
+          "cycle_time": "00:00:23"
+        },
+        {
+          "operation": "op2_relief_c1",
+          "type": "vcarve",
+          "tool_number": 2,
+          "commands": 7345,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": -38.6569,
+          "x_max": 0.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.9,
+          "cycle_time": "00:25:33"
+        },
+        {
+          "operation": "op3_pearls_c1",
+          "type": "drilling",
+          "tool_number": 2,
+          "commands": 112,
+          "z_min": -2.35,
+          "z_max": 8.0,
+          "x_min": -42.4,
+          "x_max": 0.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.35,
+          "cycle_time": "00:00:05"
+        },
+        {
+          "operation": "op4_serration_c1",
+          "type": "engrave",
+          "tool_number": 2,
+          "commands": 782,
+          "z_min": -2.3,
+          "z_max": 8.0,
+          "x_min": -45.0,
+          "x_max": 0.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.3,
+          "cycle_time": "00:08:50"
+        },
+        {
+          "operation": "op2_relief_c2",
+          "type": "vcarve",
+          "tool_number": 2,
+          "commands": 7356,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": 0.0,
+          "x_max": 38.852,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.9,
+          "cycle_time": "00:25:40"
+        },
+        {
+          "operation": "op3_pearls_c2",
+          "type": "drilling",
+          "tool_number": 2,
+          "commands": 112,
+          "z_min": -2.35,
+          "z_max": 8.0,
+          "x_min": 0.0,
+          "x_max": 42.4,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.35,
+          "cycle_time": "00:00:05"
+        },
+        {
+          "operation": "op4_serration_c2",
+          "type": "engrave",
+          "tool_number": 2,
+          "commands": 782,
+          "z_min": -2.3,
+          "z_max": 8.0,
+          "x_min": 0.0,
+          "x_max": 45.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.3,
+          "cycle_time": "00:08:50"
+        },
+        {
+          "operation": "op2_relief_c3",
+          "type": "vcarve",
+          "tool_number": 2,
+          "commands": 9297,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": -40.152,
+          "x_max": 0.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.9,
+          "cycle_time": "00:34:55"
+        },
+        {
+          "operation": "op3_pearls_c3",
+          "type": "drilling",
+          "tool_number": 2,
+          "commands": 112,
+          "z_min": -2.35,
+          "z_max": 8.0,
+          "x_min": -42.4,
+          "x_max": 0.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.35,
+          "cycle_time": "00:00:05"
+        },
+        {
+          "operation": "op4_serration_c3",
+          "type": "engrave",
+          "tool_number": 2,
+          "commands": 782,
+          "z_min": -2.3,
+          "z_max": 8.0,
+          "x_min": -45.0,
+          "x_max": 0.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.3,
+          "cycle_time": "00:08:50"
+        },
+        {
+          "operation": "op2_relief_c4",
+          "type": "vcarve",
+          "tool_number": 2,
+          "commands": 9318,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": 0.0,
+          "x_max": 40.073,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.9,
+          "cycle_time": "00:35:08"
+        },
+        {
+          "operation": "op3_pearls_c4",
+          "type": "drilling",
+          "tool_number": 2,
+          "commands": 112,
+          "z_min": -2.35,
+          "z_max": 8.0,
+          "x_min": 0.0,
+          "x_max": 42.4,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.35,
+          "cycle_time": "00:00:05"
+        },
+        {
+          "operation": "op4_serration_c4",
+          "type": "engrave",
+          "tool_number": 2,
+          "commands": 782,
+          "z_min": -2.3,
+          "z_max": 8.0,
+          "x_min": 0.0,
+          "x_max": 45.0,
+          "StartDepth": -1.8,
+          "FinalDepth": -2.3,
+          "cycle_time": "00:08:50"
+        }
+      ],
+      "job_estimated_seconds": 9722.8,
+      "pearl_plunges": 208,
+      "serration_notches": 520,
+      "gcode": [
+        {
+          "file": "sheet2-10-op1-T1-endmill3175.gcode",
+          "ok": true,
+          "lines": 1653,
+          "z_min": -6.0,
+          "z_max": 8.0,
+          "x_min": -44.0,
+          "x_max": 44.0,
+          "y_min": -43.4122,
+          "y_max": 43.4122,
+          "tools": [
+            1
+          ],
+          "estimated_seconds": 2029.0,
+          "moves": {
+            "rapid": 796,
+            "feed": 272,
+            "arc": 544,
+            "plunges": 32,
+            "drill_cycles": 0
+          }
+        },
+        {
+          "file": "sheet2-10-op2_4-T2-vbit30.gcode",
+          "ok": true,
+          "lines": 37573,
+          "z_min": -2.9,
+          "z_max": 8.0,
+          "x_min": -45.0,
+          "x_max": 45.0,
+          "y_min": -44.994,
+          "y_max": 44.994,
+          "tools": [
+            2
+          ],
+          "estimated_seconds": 8844.1,
+          "moves": {
+            "rapid": 6488,
+            "feed": 30792,
+            "arc": 0,
+            "plunges": 208,
+            "drill_cycles": 0
+          }
+        }
+      ]
+    }
+  ],
+  "seconds": 157.9
+}

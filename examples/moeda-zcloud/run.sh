@@ -13,6 +13,13 @@
 #
 # Everything the script writes lands in the output folder below, plus a copy of
 # the README and the validation JSON in examples/moeda-zcloud/out/.
+#
+# Environment:
+#   MOEDA_LAYOUT      single (default) | sheet2 — one block per coin face, or one
+#                     100x100x10 block with four cavities (two coins).
+#   MOEDA_VALUES      denominations to build, e.g. "10" (default "1 5 10").
+#   MOEDA_MASTER_SCAD path to the OpenSCAD master.
+#   MOEDA_OUT_DIR     where the models and the G-code go.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -26,6 +33,13 @@ if [ ! -f "${MASTER}" ]; then
   exit 1
 fi
 SVG_DIR="${HERE}/svg"
+LAYOUT="${MOEDA_LAYOUT:-single}"
+VALUES="${MOEDA_VALUES:-1 5 10}"
+case "${LAYOUT}" in
+  single|sheet2) ;;
+  *) echo "error: MOEDA_LAYOUT must be single or sheet2, got '${LAYOUT}'" >&2; exit 1 ;;
+esac
+OUT_DIR_ENV="${MOEDA_OUT_DIR:-${HERE}/out/cnc}"
 
 command -v openscad >/dev/null 2>&1 || { echo "error: openscad not found" >&2; exit 1; }
 command -v flatpak >/dev/null 2>&1 || { echo "error: flatpak not found" >&2; exit 1; }
@@ -38,11 +52,12 @@ mkdir -p "${HERE}/out"
 WRAPPER="${HERE}/out/face2d.scad"
 sed "s#@MASTER_SCAD@#${MASTER}#" "${HERE}/face2d.scad" > "${WRAPPER}"
 
-echo "### 1/2 exporting the coin faces with openscad (host)"
+echo "### 1/2 exporting the coin faces with openscad (host) [layout ${LAYOUT}, values ${VALUES}]"
 # denomination -> coin diameter, from moeda-zcloud.md section 3.
 for pair in "1:34" "5:37" "10:40"; do
   value="${pair%%:*}"
   diameter="${pair##*:}"
+  case " ${VALUES} " in *" ${value} "*) ;; *) continue ;; esac
   for face in anverso reverso; do
     out="${SVG_DIR}/${face}-${value}.svg"
     openscad -o "${out}" \
@@ -57,9 +72,20 @@ done
 
 echo
 echo "### 2/2 building the molds and the G-code (FreeCAD headless)"
-flatpak run --command=FreeCADCmd "${FLATPAK_APP}" "${HERE}/build_molds.py" >/dev/null
+# The env is passed explicitly: the sandbox does not forward the host environment
+# for anything the script must not guess.
+flatpak run --command=FreeCADCmd \
+  --env=MOEDA_LAYOUT="${LAYOUT}" \
+  --env=MOEDA_VALUES="${VALUES}" \
+  --env=MOEDA_OUT_DIR="${OUT_DIR_ENV}" \
+  "${FLATPAK_APP}" "${HERE}/build_molds.py" >/dev/null
 
 echo
 echo "### output"
-sed -n '/^| file/,/^$/p' "${HERE}/out/README.md"
-echo "README and validation.json: ${HERE}/out/"
+if [ "${LAYOUT}" = "sheet2" ]; then
+  REPORT="${HERE}/out/README-sheet2.md"
+else
+  REPORT="${HERE}/out/README.md"
+fi
+sed -n '/^| file/,/^$/p' "${REPORT}"
+echo "$(basename "${REPORT}") and the validation JSON: ${HERE}/out/"

@@ -143,6 +143,9 @@ exports six coin faces with openscad, builds six mold blocks with cavity,
 V-carved relief, 52 pearl dimples and 130 serration notches each, and posts
 twelve GRBL files — all of them passing `cam_gcode_check`, with a generated
 README carrying the zero convention, feeds, run order and the validation table.
+`MOEDA_LAYOUT=sheet2` builds the other layout instead: one 100 x 100 x 10 mm
+block per denomination with four cavities, four alignment pin holes and one
+posted file per tool, sawn once into the two mold halves.
 
 Everything FreeCAD does is reachable: `fc_exec` runs any FreeCAD Python, and the
 knowledge tools plus the recipes under `freecad/AiBridge/recipes/` (PartDesign,
