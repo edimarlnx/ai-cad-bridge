@@ -102,14 +102,14 @@ PIN_HOLES = [
     {"name": "p3", "strip": "B", "centre": (-44.0, -6.0)},
     {"name": "p4", "strip": "B", "centre": (44.0, -6.0)},
 ]
-PIN_HOLE_DIAMETER = 3.2    # modelled; machined with the Ø3.175 end mill (T1)
 PIN_HOLE_DEPTH = 6.0       # blind, in a 10 mm block
-PIN_DIAMETER = 3.10        # turned on the lathe: 0.1 mm clearance in a Ø3.2 hole
 PIN_LENGTH = 11.0
 PIN_CHAMFER = 0.5          # 0.5 x 45 degrees on both ends
 PIN_MIN_EDGE = 4.0         # hole edge to block edge and to the saw line
 PIN_MIN_CAVITY = 5.0       # hole edge to cavity edge
-PIN_PECK_DEPTH = 1.5       # chip clearing in a 6 mm blind hole
+PIN_RETRACT_HEIGHT = 1.0   # peck retract; rapids still travel at SAFE_HEIGHT
+# PIN_HOLE_DIAMETER, PIN_DIAMETER and PIN_PECK_DEPTH follow the T1 profile below:
+# the holes are plunged with the roughing bit, so the bore IS the tool diameter.
 
 # Block height: 10 mm for the sheet, 8 mm for the legacy single blocks.
 MOLD_HEIGHT = float(os.environ.get("MOEDA_MOLD_HEIGHT")
@@ -129,14 +129,43 @@ CLEARANCE_HEIGHT = 8.0
 Z_FLOOR = -(CAVITY_DEPTH + RELIEF)          # -2.9, the deepest legal cut
 Z_FLOOR_TOLERANCE = -3.1                    # the check limit asked for
 
-# 3018 router, POM/nylon.
-T1 = {
-    "number": 1, "shape": "endmill", "label": "T1 endmill 3.175",
-    "diameter": 3.175, "flutes": 2,
-    "horiz_feed": 600.0, "vert_feed": 200.0,
-    "horiz_rapid": 2000.0, "vert_rapid": 800.0, "spindle_speed": 10000.0,
-    "step_down": 0.6, "step_over": 40.0,
+# 3018 router, POM/nylon. The roughing bit is a parameter: MOEDA_T1_DIAMETER
+# picks one of the profiles below, feeds and all, because a 4-flute HSS Ø3.0
+# does not want the same numbers as a 2-flute carbide Ø3.175.
+T1_PROFILES = {
+    3.0: {
+        "label": "T1 endmill 3.0 HSS 4F", "flutes": 4, "shank": 6.0,
+        "description": "flat end mill Ø3.0 mm HSS, 4 flutes, 6 mm shank",
+        "horiz_feed": 500.0, "vert_feed": 150.0,
+        "step_down": 0.5, "step_over": 40.0, "peck_depth": 1.0,
+    },
+    3.175: {
+        "label": "T1 endmill 3.175", "flutes": 2, "shank": 3.175,
+        "description": "flat end mill Ø3.175 mm, 2 flutes",
+        "horiz_feed": 600.0, "vert_feed": 200.0,
+        "step_down": 0.6, "step_over": 40.0, "peck_depth": 1.5,
+    },
 }
+T1_DIAMETER = round(float(os.environ.get("MOEDA_T1_DIAMETER") or 3.0), 4)
+if T1_DIAMETER not in T1_PROFILES:
+    raise SystemExit("MOEDA_T1_DIAMETER must be one of %s, got %s"
+                     % (sorted(T1_PROFILES), T1_DIAMETER))
+_T1_PROFILE = T1_PROFILES[T1_DIAMETER]
+T1 = {
+    "number": 1, "shape": "endmill", "label": _T1_PROFILE["label"],
+    "diameter": T1_DIAMETER, "flutes": _T1_PROFILE["flutes"],
+    "shank_diameter": _T1_PROFILE["shank"],
+    "description": _T1_PROFILE["description"],
+    "horiz_feed": _T1_PROFILE["horiz_feed"], "vert_feed": _T1_PROFILE["vert_feed"],
+    "horiz_rapid": 2000.0, "vert_rapid": 800.0, "spindle_speed": 10000.0,
+    "step_down": _T1_PROFILE["step_down"], "step_over": _T1_PROFILE["step_over"],
+}
+
+# Pin holes are plunged with T1, so the hole is the tool diameter exactly and the
+# pin is turned 0.1 mm under it.
+PIN_HOLE_DIAMETER = T1["diameter"]
+PIN_DIAMETER = round(PIN_HOLE_DIAMETER - 0.1, 3)
+PIN_PECK_DEPTH = _T1_PROFILE["peck_depth"]
 T2 = {
     "number": 2, "shape": "v-bit", "label": "T2 v-bit 30",
     "diameter": 3.175, "cutting_edge_angle": 30.0, "tip_diameter": 0.1,
@@ -354,7 +383,8 @@ def build_face(doc, value, diameter, face_name, gcode_dir, models_dir):
 
     tool1 = call("cam_tool_add", job=job_name, doc=doc.Name,
                  reuse=job_info["tools"][0]["name"], bit_label="Endmill 3.175",
-                 **{k: v for k, v in T1.items() if k not in ("shape", "step_down", "step_over")})
+                 **{k: v for k, v in T1.items()
+                    if k not in ("shape", "step_down", "step_over", "description")})
     tool2 = call("cam_tool_add", job=job_name, doc=doc.Name, bit_label="V-bit 30",
                  **{k: v for k, v in T2.items()})
 
@@ -515,7 +545,8 @@ def build_sheet2(doc, value, diameter, gcode_dir, models_dir):
 
     tool1 = call("cam_tool_add", job=job_name, doc=doc.Name,
                  reuse=job_info["tools"][0]["name"], bit_label="Endmill 3.175",
-                 **{k: v for k, v in T1.items() if k not in ("shape", "step_down", "step_over")})
+                 **{k: v for k, v in T1.items()
+                    if k not in ("shape", "step_down", "step_over", "description")})
     tool2 = call("cam_tool_add", job=job_name, doc=doc.Name, bit_label="V-bit 30",
                  **{k: v for k, v in T2.items()})
 
@@ -682,6 +713,7 @@ def build_sheet2(doc, value, diameter, gcode_dir, models_dir):
             "diameter_mm": PIN_HOLE_DIAMETER,
             "depth_mm": PIN_HOLE_DEPTH,
             "peck_depth_mm": PIN_PECK_DEPTH,
+            "retract_height_mm": PIN_RETRACT_HEIGHT,
             "operation": op_pins["operation"],
             "type": op_pins["type"],
             "bottom_points": len(bottoms),
@@ -708,12 +740,16 @@ def build_sheet2(doc, value, diameter, gcode_dir, models_dir):
 def add_pin_holes_op(doc, job_name, clone, controller, heights):
     """Plunge the four pin holes with T1, pecking, at the controller's plunge feed.
 
-    A helix was tried first and rejected: with a Ø3.175 end mill in a Ø3.2 hole
-    the helix radius is 12.5 um, so it is a plunge with a wobble — but FreeCAD
-    posts its arcs at the *horizontal* feed (600 mm/min), and it rapids those
-    12.5 um in XY at full depth, which is exactly the pattern cam_gcode_check
-    exists to catch. Plunging is the same cut, at the plunge feed, with pecks to
-    clear the chips out of a 6 mm blind hole. The bore is then the tool diameter.
+    The hole is the tool: it is cut by plunging the roughing bit, so its diameter
+    is T1's and the pin is turned 0.1 mm under that. A helix was tried in an
+    earlier revision and rejected — with the tool nearly filling the hole the
+    helix radius is a few microns, FreeCAD posts those arcs at the *horizontal*
+    feed and rapids the microns in XY at full depth, which is exactly the pattern
+    cam_gcode_check exists to catch.
+
+    RetractHeight is the peck retract, well below SafeHeight: G83 pecks start at
+    the retract plane, so leaving it at 5 mm made the first pecks cut air above
+    the block. Rapids between holes still travel at ClearanceHeight.
     """
     del clone
     op = call("cam_op_add", job=job_name, doc=doc.Name, type="drilling",
@@ -721,11 +757,11 @@ def add_pin_holes_op(doc, job_name, clone, controller, heights):
               locations=[list(hole["centre"]) + [0.0] for hole in PIN_HOLES],
               properties=dict(heights, StartDepth=0.0, FinalDepth=-PIN_HOLE_DEPTH,
                               PeckEnabled=True, PeckDepth=PIN_PECK_DEPTH,
-                              RetractHeight=SAFE_HEIGHT))
+                              RetractHeight=PIN_RETRACT_HEIGHT))
     if not op.get("commands"):
         raise RuntimeError("the pin hole operation produced no toolpath")
-    log("  pin holes plunged with %.1f mm pecks (%d commands)"
-        % (PIN_PECK_DEPTH, op["commands"]))
+    log("  pin holes Ø%.3f plunged with %.1f mm pecks, retract %.1f (%d commands)"
+        % (PIN_HOLE_DIAMETER, PIN_PECK_DEPTH, PIN_RETRACT_HEIGHT, op["commands"]))
     return op
 
 
@@ -1054,21 +1090,20 @@ def render_sheet2_readme(report):
     add("\nTwo holes per strip, one at each end: **(±44, +6)** in strip A and ")
     add("**(±44, −6)** in strip B. The pair is mirrored in Y — not point-symmetric — ")
     add("precisely because the closing flip is about the X axis, so p3→p1 and p4→p2.\n")
-    add("\n- **Holes:** nominal Ø%.1f mm, **%.1f mm deep** (blind, in a %.0f mm block), "
-        "cut with **T1** right after the four pockets, so the job still needs a single "
-        "tool change. They are **plunged** at %.0f mm/min with %.1f mm pecks, so the "
-        "bore comes out at the tool diameter, **Ø%.3f mm**, not Ø%.1f.\n"
+    add("\n- **Holes: Ø%.1f mm** — the T1 bit itself, **plunged**, so the bore is the "
+        "tool diameter and nothing else. **%.1f mm deep** (blind, in a %.0f mm block), "
+        "cut right after the four pockets, so the job still needs a single tool change. "
+        "Plunge %.0f mm/min, %.1f mm pecks, peck retract %.1f mm.\n"
         % (holes["diameter_mm"], holes["depth_mm"], report["block_height_mm"],
            report["tools"]["T1"]["vert_feed"], holes["peck_depth_mm"],
-           report["tools"]["T1"]["diameter"], holes["diameter_mm"]))
+           holes["retract_height_mm"]))
     add("- **Pins:** turn **%d** of them on the lathe — **Ø%.2f mm × %.0f mm**, steel or "
-        "brass, **%.1f × 45° chamfer on both ends**. In the Ø%.3f mm bore that is "
-        "%.3f mm of clearance; take another 0.05 mm off the pin if it binds, and prove "
-        "the fit on a scrap hole before turning all four. Each pin spans %.1f mm of the "
-        "two %.1f mm holes when the halves are closed.\n"
+        "brass, **%.1f × 45° chamfer on both ends**. That is %.1f mm of clearance in "
+        "the Ø%.1f mm hole; prove the fit on a scrap hole before turning all four, and "
+        "take another 0.05 mm off if it binds. Each pin spans %.1f mm of the two "
+        "%.1f mm holes when the halves are closed.\n"
         % (pin["count"], pin["diameter_mm"], pin["length_mm"], pin["chamfer_mm"],
-           report["tools"]["T1"]["diameter"],
-           report["tools"]["T1"]["diameter"] - pin["diameter_mm"],
+           holes["diameter_mm"] - pin["diameter_mm"], holes["diameter_mm"],
            pin["length_mm"] / 2, holes["depth_mm"]))
     add("\n| pin | strip | XY | to block edge | to saw line | to cavity edge |\n")
     add("|---|---|---|---|---|---|\n")
@@ -1113,8 +1148,8 @@ def render_sheet2_readme(report):
     add("| tool | bit | spindle | feed | plunge | step-down | step-over |\n")
     add("|---|---|---|---|---|---|---|\n")
     t1, t2 = report["tools"]["T1"], report["tools"]["T2"]
-    add("| T1 | flat end mill Ø%.3f mm | %.0f rpm | %.0f mm/min | %.0f mm/min | %.1f mm | %.0f%% |\n"
-        % (t1["diameter"], t1["spindle_speed"], t1["horiz_feed"], t1["vert_feed"],
+    add("| T1 | %s | %.0f rpm | %.0f mm/min | %.0f mm/min | %.1f mm | %.0f%% |\n"
+        % (t1["description"], t1["spindle_speed"], t1["horiz_feed"], t1["vert_feed"],
            t1["step_down"], t1["step_over"]))
     add("| T2 | V-bit %.0f° (tip Ø%.1f mm) | %.0f rpm | %.0f mm/min | %.0f mm/min | — | — |\n"
         % (t2["cutting_edge_angle"], t2["tip_diameter"], t2["spindle_speed"],
@@ -1186,19 +1221,21 @@ def render_sheet2_readme(report):
         "a single Z re-zero at the tool change is the safest sequence. The cost is that "
         "an aborted run loses more work than a per-cavity file would.")
     add("\n- **Saw allowance.** The single saw line (Y = 0) passes 5 mm from the nearest "
-        "Ø40 cavity wall and 4.4 mm from a pin hole. Keep the parting face flat: the "
-        "mold halves close on it, and the pins only centre them, they do not clamp.")
-    add("\n- **Pin holes: plunged, not bored.** A helix was tried first, and dropped: "
-        "with a Ø%.3f mm end mill in a Ø%.1f mm hole the helix radius is %.0f µm, so it "
-        "is a plunge with a wobble — but FreeCAD posts its arcs at the horizontal feed "
-        "(%.0f mm/min) and rapids those µm in XY at full depth. Plunging is the same "
-        "cut at the proper %.0f mm/min plunge feed, and it is what the file does. So "
-        "the hole is Ø%.3f mm and the Ø3.10 pin has 0.075 mm of clearance instead of "
-        "the 0.1 mm the drawing assumes — ream the holes to Ø3.2 if you want the "
-        "drawing figure exactly."
-        % (t1["diameter"], PIN_HOLE_DIAMETER,
-           (PIN_HOLE_DIAMETER - t1["diameter"]) / 2 * 1000.0,
-           t1["horiz_feed"], t1["vert_feed"], t1["diameter"]))
+        "Ø40 cavity wall and %.2f mm from a pin hole. Keep the parting face flat: the "
+        "mold halves close on it, and the pins only centre them, they do not clamp."
+        % min(entry["to_saw_line_mm"] for entry in worst["pin_holes"]["clearances"]))
+    add("\n- **Pin holes: plunged, not bored.** The hole is Ø%.1f mm because the T1 bit "
+        "is Ø%.1f mm and it is simply plunged — no interpolation, so no runout error on "
+        "the hole size, and no second tool. A helix was tried in an earlier revision and "
+        "dropped: with the tool nearly filling the hole the helix radius is a few "
+        "microns, and FreeCAD posts those arcs at the horizontal feed while rapiding the "
+        "microns in XY at full depth, which is what cam_gcode_check is there to catch."
+        % (PIN_HOLE_DIAMETER, t1["diameter"]))
+    add("\n- **Four flutes in plastic.** The %s packs its gullets with POM swarf far "
+        "faster than a 2-flute would. Keep the passes shallow — the file already uses "
+        "%.1f mm per step-down and %.1f mm pecks — and blow or vacuum the chips out "
+        "between passes; a clogged flute rubs, melts the POM and welds a collar to the "
+        "tool." % (t1["description"], t1["step_down"], PIN_PECK_DEPTH))
     add("\n- **Pearls.** A 30° V-bit plunged %.2f mm leaves a cone about Ø0.30 mm wide at "
         "the floor, smaller than the master's Ø1.1 mm beads. A Ø1 mm ball nose is the fix "
         "if the dots read too fine." % PEARL_DEPTH)
