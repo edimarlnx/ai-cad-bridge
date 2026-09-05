@@ -147,6 +147,37 @@ README carrying the zero convention, feeds, run order and the validation table.
 block per denomination with four cavities, four alignment pin holes and one
 posted file per tool, sawn once into the two mold halves.
 
+### Simulate G-code to video
+
+`cam_gcode_check` proves the numbers; `bridge/cam_sim_video.py` lets you *watch*
+the block being machined before a single chip flies. The stock is a top-view
+heightmap, every cutting move stamps the tool's own bottom profile into it (flat
+end mill, ball nose or V-bit cone), and one frame is emitted per N seconds of
+machine time:
+
+```bash
+python3 bridge/cam_sim_video.py --stock 100x100x10 --origin center \
+  --tool endmill:3.0 gcode/10/sheet2-10-op1-T1-endmill30.gcode \
+  --tool vbit:30:0.1 gcode/10/sheet2-10-op2_4-T2-vbit30.gcode \
+  --out sim/sheet2-10.mp4 --machine-seconds-per-frame 10 --fps 30 --resolution 0.1
+```
+
+A `--tool` applies to the files that follow it and the files run in order on the
+**same** stock, so a two-tool job is one continuous video with a tool-change
+banner in between. Out comes the MP4, a `.final.png` of the finished block and a
+JSON summary on stdout: machine time per file, deepest Z, XY reached against the
+stock, and the count of rapids that actually removed material — a crash, as
+opposed to the peck-drill re-entries and retracts that also run below Z0 but cut
+nothing. The 3 h 22 min two-file block above simulates in about 45 seconds.
+
+`bash examples/moeda-zcloud/simulate.sh` does exactly that for the sheet2 block
+(`MOEDA_OUT_DIR` points it at the G-code, `MOEDA_VALUES` picks the
+denominations).
+
+This is the one **optional** part of the repo: it needs `numpy`, `Pillow` and the
+`ffmpeg` binary, and says so plainly if they are missing. The MCP server and the
+add-on remain standard library only.
+
 Everything FreeCAD does is reachable: `fc_exec` runs any FreeCAD Python, and the
 knowledge tools plus the recipes under `freecad/AiBridge/recipes/` (PartDesign,
 Assembly, TechDraw, CAM, Part — all verified headless on FreeCAD 1.1.3) mean the
@@ -183,7 +214,12 @@ exports STL, undoes and redoes, probes `PartDesign::Pad`, reads a recipe and
 saves the document, then runs a full CAM path (job on a box, a pocket, GRBL
 post-processing, and the G-code parser accepting the good file and rejecting a
 handmade bad one). `tests/test_mcp_stdio.py` drives the MCP server over pipes
-against a fake add-on, including the offline fallback. Test scripts must live
+against a fake add-on, including the offline fallback. `tests/test_sim_video.py`
+measures the simulator's heightmap on synthetic G-code — a slot exactly 2 mm
+wide and 1 mm deep, a G2 full circle, a 30° V-bit cone 0.64 mm across, both
+directions of an R arc, inch and incremental modes, and a rapid that ploughs
+through material (a crash) told apart from a peck re-entry that does not; it
+skips with a message when numpy/Pillow are not installed. Test scripts must live
 under `$HOME`: the Flatpak sandbox cannot see `/tmp`.
 
 The offline fallback catalogue is generated, not hand-written — a client caches

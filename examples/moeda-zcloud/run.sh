@@ -89,3 +89,9 @@ else
 fi
 sed -n '/^| file/,/^$/p' "${REPORT}"
 echo "$(basename "${REPORT}") and the validation JSON: ${HERE}/out/"
+
+if [ "${LAYOUT}" = "sheet2" ]; then
+  echo
+  echo "### watch it cut (optional: numpy, Pillow, ffmpeg)"
+  echo "  MOEDA_OUT_DIR=${OUT_DIR_ENV} MOEDA_VALUES=\"${VALUES}\" bash ${HERE}/simulate.sh"
+fi
