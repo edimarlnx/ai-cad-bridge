@@ -164,6 +164,8 @@ T1 = {
 # Pin holes are plunged with T1, so the hole is the tool diameter exactly and the
 # pin is turned 0.1 mm under it.
 PIN_HOLE_DIAMETER = T1["diameter"]
+# File-name tag for T1, derived from the diameter: 3.0 -> "endmill30", 3.175 -> "endmill3175".
+T1_TAG = "endmill" + ("%g" % T1["diameter"]).replace(".", "")
 PIN_DIAMETER = round(PIN_HOLE_DIAMETER - 0.1, 3)
 PIN_PECK_DEPTH = _T1_PROFILE["peck_depth"]
 T2 = {
@@ -431,7 +433,7 @@ def build_face(doc, value, diameter, face_name, gcode_dir, models_dir):
     if not inspection["ok"]:
         raise RuntimeError("cam_inspect rejected %s: %s" % (tag, inspection["issues"]))
 
-    files = ["%s-%s-op1-T1-endmill3175.gcode" % (face_name, value),
+    files = ["%s-%s-op1-T1-%s.gcode" % (face_name, value, T1_TAG),
              "%s-%s-op2_4-T2-vbit30.gcode" % (face_name, value)]
     posted = call("cam_postprocess", job=job_name, doc=doc.Name, post=POST,
                   post_args=POST_ARGS, split_by="tool", output_dir=gcode_dir,
@@ -609,7 +611,7 @@ def build_sheet2(doc, value, diameter, gcode_dir, models_dir):
     if not inspection["ok"]:
         raise RuntimeError("cam_inspect rejected %s: %s" % (tag, inspection["issues"]))
 
-    files = ["sheet2-%s-op1-T1-endmill3175.gcode" % value,
+    files = ["sheet2-%s-op1-T1-%s.gcode" % (value, T1_TAG),
              "sheet2-%s-op2_4-T2-vbit30.gcode" % value]
     posted = call("cam_postprocess", job=job_name, doc=doc.Name, post=POST,
                   post_args=POST_ARGS, split_by="tool", output_dir=gcode_dir,
@@ -981,7 +983,7 @@ def render_readme(report):
     add("\n## Run order\n")
     add("\n1. Fixture the block, find the cavity centre, set **X0 Y0** there.")
     add("\n2. Touch off the **top face** of the block: **Z0**.")
-    add("\n3. Run `<face>-<value>-op1-T1-endmill3175.gcode` (T1 clears the Ø d cavity to Z-1.80).")
+    add("\n3. Run `<face>-<value>-op1-T1-%s.gcode` (T1 clears the Ø d cavity to Z-1.80)." % T1_TAG)
     add("\n4. Change to the V-bit. **Do not touch X/Y.** Re-zero **Z only** on the same top face.")
     add("\n5. Run `<face>-<value>-op2_4-T2-vbit30.gcode` (relief, pearls, serration).")
     add("\n6. Deburr, blow out the chips, apply release agent before casting.\n")
@@ -1158,9 +1160,9 @@ def render_sheet2_readme(report):
     add("\n## Run order (one setup, one tool change, per block)\n")
     add("\n1. Fixture the 100 x 100 block. Find the **block centre** and set **X0 Y0** there.")
     add("\n2. Touch off the **top face**: **Z0**.")
-    add("\n3. Run `sheet2-<value>-op1-T1-endmill3175.gcode` \u2014 T1 clears all four "
+    add("\n3. Run `sheet2-<value>-op1-T1-%s.gcode` \u2014 T1 clears all four "
         "cavities to Z-%.2f **and bores the four pin holes to Z-%.2f**, in one file."
-        % (CAVITY_DEPTH, PIN_HOLE_DEPTH))
+        % (T1_TAG, CAVITY_DEPTH, PIN_HOLE_DEPTH))
     add("\n4. Change to the V-bit. **Do not touch X/Y.** Re-zero **Z only** on the same "
         "top face.")
     add("\n5. Run `sheet2-<value>-op2_4-T2-vbit30.gcode` \u2014 relief, pearls and "

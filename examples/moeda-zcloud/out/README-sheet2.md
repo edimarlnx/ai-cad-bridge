@@ -80,7 +80,7 @@ One `models/sheet2-<value>-d<Ø>.FCStd` per denomination, plus the STEP and STL 
 
 1. Fixture the 100 x 100 block. Find the **block centre** and set **X0 Y0** there.
 2. Touch off the **top face**: **Z0**.
-3. Run `sheet2-<value>-op1-T1-endmill3175.gcode` — T1 clears all four cavities to Z-1.80 **and bores the four pin holes to Z-6.00**, in one file.
+3. Run `sheet2-<value>-op1-T1-endmill30.gcode` — T1 clears all four cavities to Z-1.80 **and bores the four pin holes to Z-6.00**, in one file.
 4. Change to the V-bit. **Do not touch X/Y.** Re-zero **Z only** on the same top face.
 5. Run `sheet2-<value>-op2_4-T2-vbit30.gcode` — relief, pearls and serration, cell by cell (c1, c2, c3, c4).
 6. Deburr, blow out the chips.
@@ -97,11 +97,11 @@ On top of that, in the T1 file: a cutting move on **each** of the four cavity fl
 
 | file | lines | Z min | Z max | X extent | Y extent | T | est. time |
 |---|---|---|---|---|---|---|---|
-| `1/sheet2-1-op1-T1-endmill3175.gcode` | 1845 | -6.000 | 8.000 | -44.00 … 44.00 | -40.50 … 40.50 | 1 | 41:30 |
+| `1/sheet2-1-op1-T1-endmill30.gcode` | 1845 | -6.000 | 8.000 | -44.00 … 44.00 | -40.50 … 40.50 | 1 | 41:30 |
 | `1/sheet2-1-op2_4-T2-vbit30.gcode` | 27430 | -2.900 | 8.000 | -42.00 … 42.00 | -41.99 … 41.99 | 2 | 1:55:39 |
-| `5/sheet2-5-op1-T1-endmill3175.gcode` | 2005 | -6.000 | 8.000 | -44.00 … 44.00 | -42.00 … 42.00 | 1 | 47:42 |
+| `5/sheet2-5-op1-T1-endmill30.gcode` | 2005 | -6.000 | 8.000 | -44.00 … 44.00 | -42.00 … 42.00 | 1 | 47:42 |
 | `5/sheet2-5-op2_4-T2-vbit30.gcode` | 30466 | -2.900 | 8.000 | -43.50 … 43.50 | -43.49 … 43.49 | 2 | 2:02:44 |
-| `10/sheet2-10-op1-T1-endmill3175.gcode` | 2105 | -6.000 | 8.000 | -44.00 … 44.00 | -43.50 … 43.50 | 1 | 54:28 |
+| `10/sheet2-10-op1-T1-endmill30.gcode` | 2105 | -6.000 | 8.000 | -44.00 … 44.00 | -43.50 … 43.50 | 1 | 54:28 |
 | `10/sheet2-10-op2_4-T2-vbit30.gcode` | 37573 | -2.900 | 8.000 | -45.00 … 45.00 | -44.99 … 44.99 | 2 | 2:27:24 |
 
 | block | cells reached (floor moves) | pin holes | pearls | serration | job est. |

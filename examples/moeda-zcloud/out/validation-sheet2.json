@@ -332,7 +332,7 @@
       "serration_notches": 520,
       "gcode": [
         {
-          "file": "sheet2-1-op1-T1-endmill3175.gcode",
+          "file": "sheet2-1-op1-T1-endmill30.gcode",
           "ok": true,
           "lines": 1845,
           "z_min": -6.0,
@@ -667,7 +667,7 @@
       "serration_notches": 520,
       "gcode": [
         {
-          "file": "sheet2-5-op1-T1-endmill3175.gcode",
+          "file": "sheet2-5-op1-T1-endmill30.gcode",
           "ok": true,
           "lines": 2005,
           "z_min": -6.0,
@@ -1002,7 +1002,7 @@
       "serration_notches": 520,
       "gcode": [
         {
-          "file": "sheet2-10-op1-T1-endmill3175.gcode",
+          "file": "sheet2-10-op1-T1-endmill30.gcode",
           "ok": true,
           "lines": 2105,
           "z_min": -6.0,
